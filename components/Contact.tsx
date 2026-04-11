@@ -1,8 +1,31 @@
 "use client";
 
+import { useRef, useState, useCallback } from "react";
 import { socialLinks } from "@/lib/constants";
 
 export default function Contact() {
+  const [badgeVisible, setBadgeVisible] = useState(false);
+  const badgeLoaded = useRef(false);
+  const hideTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const showBadge = useCallback(() => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    setBadgeVisible(true);
+
+    if (!badgeLoaded.current) {
+      badgeLoaded.current = true;
+      const script = document.createElement("script");
+      script.src = "https://platform.linkedin.com/badges/js/profile.js";
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  const hideBadge = useCallback(() => {
+    hideTimer.current = setTimeout(() => setBadgeVisible(false), 200);
+  }, []);
+
   return (
     <footer id="contact" className="relative px-4 py-6 md:px-8 md:py-10 lg:px-12">
       <div className="editorial-shell pb-8 md:pb-10">
@@ -30,16 +53,46 @@ export default function Contact() {
               >
                 Email
               </a>
-              <a
-                href={socialLinks.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-underline font-mono text-[10px] tracking-[0.12em] text-text-muted transition-colors duration-300 hover:text-text"
-                data-cursor-hover
-                data-cursor-label="linkedin"
+              <span
+                className="relative"
+                onMouseEnter={showBadge}
+                onMouseLeave={hideBadge}
               >
-                LinkedIn ↗
-              </a>
+                <a
+                  href={socialLinks.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline font-mono text-[10px] tracking-[0.12em] text-text-muted transition-colors duration-300 hover:text-text"
+                  data-cursor-hover
+                  data-cursor-label="linkedin"
+                >
+                  LinkedIn ↗
+                </a>
+                {badgeVisible && (
+                  <div
+                    className="absolute bottom-full left-1/2 z-50 mb-3 -translate-x-1/2 rounded-xl border border-line bg-bg-elevated p-2 shadow-2xl"
+                    onMouseEnter={showBadge}
+                    onMouseLeave={hideBadge}
+                  >
+                    <div
+                      className="badge-base LI-profile-badge"
+                      data-locale="en_US"
+                      data-size="large"
+                      data-theme="dark"
+                      data-type="HORIZONTAL"
+                      data-vanity="sai-uttej-r"
+                      data-version="v1"
+                    >
+                      <a
+                        className="badge-base__link LI-simple-link"
+                        href="https://in.linkedin.com/in/sai-uttej-r?trk=profile-badge"
+                      >
+                        Sai Uttej R
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </span>
               <a
                 href={socialLinks.github}
                 target="_blank"

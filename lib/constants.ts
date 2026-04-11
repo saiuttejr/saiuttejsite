@@ -16,6 +16,9 @@ export interface Project {
   accent: string;
   year: string;
   role: string;
+  liveUrl?: string;
+  repoUrl?: string;
+  feedbackUrl?: string;
   focus: string[];
   metrics: Metric[];
   highlights: string[];
@@ -39,6 +42,8 @@ export const projects: Project[] = [
       "3,300+ Indian and global foods with Nutri-Score grading and a daily calorie tracker. A full-stack Turborepo monorepo spanning web, mobile (coming soon), and a B2B API (coming soon).",
     tech: "Next.js 15 · React Native · Hono · Supabase",
     url: "https://eatensity.com",
+    liveUrl: "https://eatensity.com",
+    feedbackUrl: "https://github.com/Eatensity/Eatensity-feedback/",
     accent: "#b85b38",
     year: "2025",
     role: "Basically everything — data modeling, product decisions, web, mobile, API",
@@ -87,6 +92,8 @@ export const projects: Project[] = [
       "100 free calculators and converters across 8 categories, built for Indian users. No frameworks, no ads, no production dependencies.",
     tech: "Eleventy 3.x · Nunjucks · Vanilla JS/CSS",
     url: "https://figuretools.com",
+    liveUrl: "https://figuretools.com",
+    feedbackUrl: "https://github.com/saiuttejr/figuretools-feedback",
     accent: "#2d6171",
     year: "2025",
     role: "Concept, information architecture, static site, UX",
@@ -134,6 +141,7 @@ export const projects: Project[] = [
       "A personal finance tracker with CSV import, manual entry, and rule-based auto-categorization. Flags unusual expenses using mean + 2σ — just math, no black boxes.",
     tech: "Java 17 · Spring Boot 3 · Thymeleaf · Docker",
     url: "https://github.com/saiuttejr/kanso-note",
+    repoUrl: "https://github.com/saiuttejr/kanso-note",
     accent: "#8a6239",
     year: "2025",
     role: "Domain modeling, rules engine, backend, deployment",
@@ -181,6 +189,7 @@ export const projects: Project[] = [
       "A full-stack Instagram-style app with real-time interactions across 6+ data models. Dockerized with zero-downtime releases.",
     tech: "Laravel · PHP · MongoDB · Docker",
     url: "https://github.com/saiuttejr/totallynotinsta",
+    repoUrl: "https://github.com/saiuttejr/totallynotinsta",
     accent: "#43627c",
     year: "2025",
     role: "Data modeling, backend, deployment, operations",

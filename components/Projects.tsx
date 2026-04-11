@@ -16,13 +16,10 @@ export default function Projects() {
 
           <div className="divide-y divide-line">
             {projects.map((project, index) => (
-              <Link
+              <div
                 key={project.slug}
-                href={`/work/${project.slug}`}
                 data-tone={project.slug}
-                className="group block py-8 first:pt-0 md:py-10"
-                data-cursor-hover
-                data-cursor-label="case study"
+                className="group py-8 first:pt-0 md:py-10"
               >
                 <div className="grid gap-5 lg:grid-cols-[110px_minmax(0,1fr)_220px] lg:items-start lg:gap-8">
                   <div className="flex items-baseline gap-3 text-text-dim lg:flex-col lg:gap-2">
@@ -44,10 +41,50 @@ export default function Projects() {
                     <p className="mt-4 max-w-[38rem] text-[0.97rem] leading-[1.88] text-text-muted">
                       {project.summary}
                     </p>
-                    <span className="mt-5 inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 group-hover:text-accent">
-                      <span>Read case study</span>
-                      <span aria-hidden="true">→</span>
-                    </span>
+                    <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+                      <Link
+                        href={`/work/${project.slug}`}
+                        className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                        data-cursor-hover
+                        data-cursor-label="case study"
+                      >
+                        <span>Read case study</span>
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                        >
+                          <span>Visit site</span>
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      )}
+                      {project.repoUrl && (
+                        <a
+                          href={project.repoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                        >
+                          <span>GitHub</span>
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      )}
+                      {project.feedbackUrl && (
+                        <a
+                          href={project.feedbackUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                        >
+                          <span>Feedback</span>
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-3 lg:pt-1">
@@ -63,7 +100,7 @@ export default function Projects() {
                     ))}
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
