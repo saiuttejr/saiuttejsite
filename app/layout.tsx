@@ -33,18 +33,6 @@ const jetbrainsMono = localFont({
   display: "swap",
 });
 
-const typographica = localFont({
-  src: [
-    {
-      path: "./fonts/TypoGraphica.otf",
-      weight: "400",
-      style: "normal",
-    },
-  ],
-  variable: "--font-typographica",
-  display: "swap",
-});
-
 const nunito = Nunito({
   subsets: ["latin"],
   variable: "--font-nunito",
@@ -135,7 +123,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${sora.variable} ${jetbrainsMono.variable} ${typographica.variable} ${nunito.variable} h-full antialiased`}
+      className={`${syne.variable} ${sora.variable} ${jetbrainsMono.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg">
         <div className="grain-overlay" aria-hidden="true" />
