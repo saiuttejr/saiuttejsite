@@ -270,6 +270,7 @@ export const socialLinks = {
   linkedin: "https://linkedin.com/in/sai-uttej-r",
   github: "https://github.com/saiuttejr",
   lichess: "https://lichess.org/@/Haccnt",
+  resume: "https://drive.google.com/file/d/1tBqbvw41aqyAMC8QDOSjSEE6CX8RiOVp/view?usp=sharing",
 };
 
 export const siteMetadata = {
