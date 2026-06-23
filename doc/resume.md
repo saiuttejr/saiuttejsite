@@ -67,6 +67,7 @@ Activities: College chess player, Google Developer Student Club member
 
 ## Achievements & Others
 
+- Microsoft Certified: Azure AI Apps and Agents Developer Associate (Exam AI-103) — designing and building Azure AI, generative AI, and agentic solutions.
 - Qualified GATE CSE 2024, ranked in the top 8% nationwide.
 - EF SET English Certificate: Scored 80%, achieving C2 Proficient level (CEFR) in English.
 - Solved 300+ problems on LeetCode and CodeChef; rated 1300 on CodeChef with 18 coding contest participations.

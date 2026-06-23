@@ -265,6 +265,27 @@ export const education: Education = {
   note: "GATE CSE 2024 — top 8% nationwide",
 };
 
+export interface Certification {
+  name: string;
+  issuer: string;
+  exam: string;
+  date: string;
+  credentialId: string;
+  verifyUrl: string;
+}
+
+export const certifications: Certification[] = [
+  {
+    name: "Azure AI Apps and Agents Developer Associate",
+    issuer: "Microsoft",
+    exam: "AI-103",
+    date: "June 2026",
+    credentialId: "BDA9B87516BEDCFA",
+    verifyUrl:
+      "https://learn.microsoft.com/api/credentials/share/en-us/saiuttejr/BDA9B87516BEDCFA?sharingId=A94BE217925685CA",
+  },
+];
+
 export const socialLinks = {
   email: "saiuttej.r@gmail.com",
   linkedin: "https://linkedin.com/in/sai-uttej-r",
