@@ -268,7 +268,7 @@ export const education: Education = {
 export interface Certification {
   name: string;
   issuer: string;
-  exam: string;
+  exam?: string;
   date: string;
   credentialId: string;
   verifyUrl: string;
@@ -283,6 +283,14 @@ export const certifications: Certification[] = [
     credentialId: "BDA9B87516BEDCFA",
     verifyUrl:
       "https://learn.microsoft.com/api/credentials/share/en-us/saiuttejr/BDA9B87516BEDCFA?sharingId=A94BE217925685CA",
+  },
+  {
+    name: "AI Agent Builder Associate",
+    issuer: "Microsoft",
+    date: "June 2026",
+    credentialId: "A7F5DDD0F36216BE",
+    verifyUrl:
+      "https://learn.microsoft.com/api/credentials/share/en-us/saiuttejr/A7F5DDD0F36216BE?sharingId=A94BE217925685CA",
   },
 ];
 
