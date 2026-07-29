@@ -27,7 +27,7 @@ export default function About() {
               </p>
 
               <div className="mt-10 border-t border-line pt-6">
-                <p className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
                   Education
                 </p>
                 <h3 className="mt-3 font-editorial text-[1.3rem] leading-[1.12] tracking-[-0.03em] text-text">
@@ -36,7 +36,7 @@ export default function About() {
                 <p className="mt-2 text-[0.95rem] leading-[1.82] text-text-muted">
                   {education.institution} · {education.period}
                 </p>
-                <p className="mt-3 font-mono text-[10px] tracking-[0.12em] text-accent">
+                <p className="mt-3 font-mono text-xs tracking-[0.08em] text-accent">
                   {education.note}
                 </p>
               </div>
@@ -47,11 +47,11 @@ export default function About() {
                 <div key={exp.period} className="py-6 first:pt-0 last:pb-0 md:py-7">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
                     <h3 className="card-heading">{exp.role}</h3>
-                    <span className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                    <span className="font-mono text-xs tracking-[0.08em] text-text-dim">
                       {exp.period}
                     </span>
                   </div>
-                  <p className="mt-2 font-mono text-[10px] tracking-[0.12em] text-accent">
+                  <p className="mt-2 font-mono text-xs tracking-[0.08em] text-accent">
                     {exp.company}
                   </p>
                   <p className="mt-4 max-w-[40rem] text-[0.95rem] leading-[1.88] text-text-muted">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Syne, Nunito } from "next/font/google";
+import { Instrument_Serif, Sora } from "next/font/google";
 import localFont from "next/font/local";
 import { siteMetadata, socialLinks } from "@/lib/constants";
 import ChessEasterEgg from "@/components/ChessEasterEgg";
@@ -7,10 +7,11 @@ import ChessPieces from "@/components/ChessPieces";
 import CursorLayer from "@/components/CursorLayer";
 import "./globals.css";
 
-const syne = Syne({
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
-  variable: "--font-syne",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-instrument-serif",
+  weight: ["400"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -30,13 +31,6 @@ const jetbrainsMono = localFont({
     },
   ],
   variable: "--font-jetbrains-mono",
-  display: "swap",
-});
-
-const nunito = Nunito({
-  subsets: ["latin"],
-  variable: "--font-nunito",
-  weight: ["900"],
   display: "swap",
 });
 
@@ -126,7 +120,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${sora.variable} ${jetbrainsMono.variable} ${nunito.variable} h-full antialiased`}
+      className={`${instrumentSerif.variable} ${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg">
         <a href="#main" className="skip-link">

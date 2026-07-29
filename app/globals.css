@@ -1,47 +1,94 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-bg: #06080d;
-  --color-bg-elevated: #0a0d11;
-  --color-surface: #101318;
-  --color-surface-strong: #15191f;
-  --color-line: rgba(233, 239, 247, 0.1);
-  --color-line-strong: rgba(233, 239, 247, 0.18);
-  --color-ink: #f7f9fc;
-  --color-text: #f1f3f5;
-  --color-text-muted: #bcc3cc;
-  --color-text-dim: #767f89;
-  --color-accent: #f2f3f5;
-  --color-accent-secondary: #c9ced5;
-  --color-accent-dim: rgba(242, 243, 245, 0.14);
-  --color-racing: #ff5b2b;
-  --color-racing-secondary: #d7dde3;
-  --color-warm: #ff7a45;
-  --color-warm-soft: rgba(255, 122, 69, 0.16);
-  --color-panel: rgba(17, 24, 33, 0.84);
-  --color-panel-strong: rgba(11, 16, 22, 0.96);
-  --color-panel-border: rgba(233, 239, 247, 0.1);
-  --color-panel-shadow: rgba(0, 0, 0, 0.42);
+/* ==========================================================================
+   Design tokens
+   Every contrast ratio below is measured against the surface it is used on
+   and satisfies WCAG 2.2 AA (4.5:1 body text, 3:1 large text and UI boundaries).
+   ========================================================================== */
 
-  /* Focus ring — 6.50:1 against #06080d, clears the 3:1 required by SC 1.4.11. */
+@theme inline {
+  /* --- Surfaces: a real elevation ramp, not four near-identical blacks ----- */
+  --color-surface-0: #06080d; /* page base                                    */
+  --color-surface-1: #0a0e14; /* subtle raise, section bands                  */
+  --color-surface-2: #10141c; /* cards                                        */
+  --color-surface-3: #161b25; /* raised / hovered cards                       */
+  --color-surface-4: #1e2531; /* highest — popovers, active chips             */
+
+  /* --- Lines ------------------------------------------------------------- */
+  --color-line-subtle: rgba(233, 239, 247, 0.08); /* decorative hairlines     */
+  --color-line: rgba(233, 239, 247, 0.14); /* default dividers               */
+  --color-line-strong: #646d7a; /* 3.83:1 on surface-0, 3.29:1 on surface-3  */
+
+  /* --- Text -------------------------------------------------------------- */
+  --color-text-primary: #f7f9fc; /* 18.99:1 on surface-0 · 16.35:1 on s-3     */
+  --color-text-secondary: #c8ced8; /* 12.66:1 on surface-0 · 10.90:1 on s-3   */
+  --color-text-tertiary: #9aa3b0; /*  7.86:1 on surface-0 ·  6.77:1 on s-3    */
+
+  /* --- Signature accent --------------------------------------------------- */
+  --color-accent: #ff5b2b; /*  6.47:1 on surface-0 ·  5.57:1 on surface-3     */
+  --color-accent-hover: #ff7a45; /*  7.75:1 on surface-0 ·  6.67:1 on s-3     */
+  --color-accent-ink: #0b0e12; /* text on an accent fill — 6.25:1            */
+  --color-accent-quiet: rgba(255, 91, 43, 0.12);
+  --color-accent-line: rgba(255, 91, 43, 0.34);
+
+  /* Focus ring — 7.75:1 on surface-0, far above the 3:1 of SC 1.4.11.        */
   --color-focus: #ff7a45;
   --color-focus-halo: rgba(255, 122, 69, 0.28);
 
-  /* Height reserved for the fixed nav pill, used by scroll-margin-top. */
-  --nav-offset: 7.5rem;
+  /* --- Legacy aliases -----------------------------------------------------
+     Kept so sections can migrate one at a time; removed once Phase 3 lands.  */
+  --color-bg: var(--color-surface-0);
+  --color-bg-elevated: var(--color-surface-1);
+  --color-surface: var(--color-surface-2);
+  --color-surface-strong: var(--color-surface-3);
+  --color-ink: var(--color-text-primary);
+  --color-text: var(--color-text-primary);
+  --color-text-muted: var(--color-text-secondary);
+  --color-text-dim: var(--color-text-tertiary);
+  --color-accent-secondary: var(--color-accent-hover);
+  --color-accent-dim: var(--color-accent-quiet);
+  --color-racing: var(--color-accent);
+  --color-racing-secondary: var(--color-text-secondary);
+  --color-warm: var(--color-accent-hover);
+  --color-warm-soft: var(--color-accent-quiet);
+  --color-panel: rgba(16, 20, 28, 0.84);
+  --color-panel-strong: rgba(10, 14, 20, 0.96);
+  --color-panel-border: var(--color-line);
+  --color-panel-shadow: rgba(0, 0, 0, 0.42);
 
+  /* --- Type ---------------------------------------------------------------
+     Three families: a display serif, a text sans, and a mono for labels.     */
+  --font-display: var(--font-instrument-serif);
+  --font-editorial: var(--font-instrument-serif);
+  --font-logo: var(--font-instrument-serif);
   --font-body: var(--font-sora);
-  --font-display: var(--font-sora);
   --font-mono: var(--font-jetbrains-mono);
-  --font-editorial: var(--font-syne);
-  --font-logo: var(--font-nunito), sans-serif;
+
+  /* Fluid type ramp. Body is 16px minimum — never below the browser default. */
+  --text-step--1: clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
+  --text-step-0: clamp(1rem, 0.97rem + 0.16vw, 1.0625rem);
+  --text-step-1: clamp(1.125rem, 1.07rem + 0.28vw, 1.25rem);
+  --text-step-2: clamp(1.375rem, 1.24rem + 0.66vw, 1.75rem);
+  --text-step-3: clamp(1.75rem, 1.45rem + 1.5vw, 2.6rem);
+  --text-step-4: clamp(2.25rem, 1.65rem + 3vw, 3.9rem);
+  --text-step-5: clamp(2.75rem, 1.6rem + 5.6vw, 5.75rem);
+  --text-step-6: clamp(3.25rem, 1.3rem + 9.4vw, 8.25rem);
+
+  /* Micro-labels never drop below 12px, and the tracking is halved from the
+     old 0.12em so they stay readable rather than merely decorative. */
+  --label-size: 0.75rem;
+  --label-tracking: 0.08em;
 
   --ease-cinematic: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --max-content: 1240px;
-  --max-prose: 680px;
+  --max-prose: 68ch;
+
+  /* Height reserved for the fixed nav pill, used by scroll-margin-top. */
+  --nav-offset: 7.5rem;
 }
+
 
 .grain-overlay {
   position: fixed;
@@ -72,9 +119,10 @@ body {
   position: relative;
   isolation: isolate;
   font-family: var(--font-body), sans-serif;
-  font-size: 15px;
-  color: var(--color-text);
-  background-color: var(--color-bg);
+  font-size: var(--text-step-0);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-0);
   background-image:
     radial-gradient(circle at 14% 16%, rgba(255, 206, 184, 0.06), transparent 24%),
     radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.04), transparent 24%),
@@ -394,64 +442,93 @@ html {
   align-items: center;
   gap: 0.75rem;
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.14em;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
-  color: var(--color-text-dim);
+  color: var(--color-text-tertiary);
 }
 
 .section-kicker::before {
   content: "";
-  width: 1.4rem;
+  width: 1.75rem;
   height: 1px;
-  background: linear-gradient(90deg, var(--color-warm), transparent);
+  background: linear-gradient(90deg, var(--color-accent), transparent);
+}
+
+/* Micro-label: the single replacement for the ~25 scattered `text-[10px]
+   tracking-[0.12em]` variants. 12px floor, halved tracking. */
+.label {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  color: var(--color-text-tertiary);
+}
+
+.label-accent {
+  color: var(--color-accent);
 }
 
 .section-prose {
   max-width: var(--max-prose);
-  font-size: clamp(0.98rem, 0.95vw, 1.05rem);
-  line-height: 1.92;
-  color: var(--color-text-muted);
+  font-size: var(--text-step-0);
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+}
+
+/* Display serif runs at a tight measure and near-solid leading — the size
+   contrast against 16px body text is what carries the editorial feel. */
+.display-xl {
+  font-family: var(--font-display), serif;
+  font-size: var(--text-step-6);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
 }
 
 .section-heading {
-  font-family: var(--font-editorial), serif;
-  font-size: clamp(2.15rem, 4.8vw, 4.8rem);
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: var(--color-text);
+  font-family: var(--font-display), serif;
+  font-size: var(--text-step-5);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
 }
 
 .section-heading-compact {
-  font-family: var(--font-editorial), serif;
-  font-size: clamp(1.7rem, 3.3vw, 2.9rem);
-  line-height: 1.02;
-  letter-spacing: -0.05em;
-  color: var(--color-text);
+  font-family: var(--font-display), serif;
+  font-size: var(--text-step-3);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
 .card-heading {
-  font-family: var(--font-editorial), serif;
-  font-size: clamp(1.28rem, 1.55vw, 1.75rem);
-  line-height: 1.08;
-  letter-spacing: -0.045em;
-  color: var(--color-text);
+  font-family: var(--font-display), serif;
+  font-size: var(--text-step-2);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
 }
 
 .metric-value {
-  font-family: var(--font-editorial), serif;
-  font-size: clamp(1.6rem, 2.5vw, 2.3rem);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
-  color: var(--color-text);
+  font-family: var(--font-display), serif;
+  font-size: var(--text-step-3);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
 }
 
 .detail-heading {
-  font-family: var(--font-editorial), serif;
-  font-size: 1.12rem;
-  line-height: 1.2;
-  letter-spacing: -0.04em;
-  color: var(--color-text);
+  font-family: var(--font-display), serif;
+  font-size: var(--text-step-2);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
 }
 
 .glass-section,
@@ -469,23 +546,24 @@ html {
 }
 
 .editorial-card {
-  border-radius: 24px;
-  border-color: rgba(233, 239, 247, 0.08);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
-    rgba(10, 14, 20, 0.28);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border-color: var(--color-line);
+  background: var(--color-surface-2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 20px 44px rgba(0, 0, 0, 0.36);
+}
+
+.editorial-card:hover {
+  border-color: var(--color-line-strong);
+  background: var(--color-surface-3);
 }
 
 .glass-inset {
   border-radius: 999px;
-  border-color: rgba(233, 239, 247, 0.12);
-  background: rgba(255, 255, 255, 0.035);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  border-color: var(--color-line);
+  background: var(--color-surface-2);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
 .glass-section::before,
@@ -510,69 +588,65 @@ html {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(233, 239, 247, 0.12);
+  min-height: 32px;
+  border: 1px solid var(--color-line);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.035);
-  padding: 0.42rem 0.78rem;
+  background: var(--color-surface-2);
+  padding: 0.45rem 0.85rem;
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--color-text-muted);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  color: var(--color-text-secondary);
 }
 
+/* Every control clears the 44x44 comfortable target (WCAG 2.5.8 asks 24x24). */
 .button-primary,
 .button-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 42px;
+  min-height: 44px;
   border-radius: 999px;
-  padding: 0.62rem 1rem;
+  padding: 0.7rem 1.35rem;
   font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
   transition:
-    transform 0.25s ease,
+    transform 0.25s var(--ease-out),
     border-color 0.25s ease,
     background-color 0.25s ease,
     color 0.25s ease,
     box-shadow 0.25s ease;
 }
 
+/* The signature accent finally carries the primary action: #ff5b2b fill with
+   #0b0e12 ink measures 6.25:1. */
 .button-primary {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(135deg, rgba(244, 246, 248, 0.98), rgba(223, 228, 233, 0.92));
-  color: #0b0e12;
-  box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  box-shadow: 0 14px 30px rgba(255, 91, 43, 0.18);
 }
 
 .button-primary:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 18px 38px rgba(0, 0, 0, 0.32),
-    0 12px 30px rgba(255, 122, 69, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.56);
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
+  box-shadow: 0 18px 38px rgba(255, 91, 43, 0.26);
 }
 
 .button-secondary {
-  border: 1px solid rgba(233, 239, 247, 0.14);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--color-text);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-line-strong);
+  background: transparent;
+  color: var(--color-text-primary);
 }
 
 .button-secondary:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.24);
-  color: var(--color-accent);
-  box-shadow:
-    0 14px 28px rgba(0, 0, 0, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+  background: var(--color-accent-quiet);
 }
 
 @media (max-width: 768px) {
@@ -812,7 +886,8 @@ a.link-underline {
   transition: background-size 0.4s ease;
 }
 
-a.link-underline:hover {
+a.link-underline:hover,
+a.link-underline:focus-visible {
   background-size: 100% 1px;
 }
 

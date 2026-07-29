@@ -34,7 +34,7 @@ export default function Projects() {
                   </Link>
 
                   <div>
-                    <p className="font-mono text-[10px] tracking-[0.12em] tone-text">
+                    <p className="font-mono text-xs tracking-[0.08em] tone-text">
                       {project.category} / {project.tagline}
                     </p>
                     <h3 className="mt-3 font-editorial text-[clamp(1.9rem,3vw,3rem)] leading-[1] tracking-[-0.04em] text-text transition-colors duration-300 group-hover:text-accent">
@@ -46,7 +46,7 @@ export default function Projects() {
                     <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
                       <Link
                         href={`/work/${project.slug}`}
-                        className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                        className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.08em] text-text-dim transition-colors duration-300 hover:text-accent"
                         data-cursor-hover
                         data-cursor-label="case study"
                       >
@@ -58,7 +58,7 @@ export default function Projects() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                          className="inline-flex items-center gap-1.5 font-mono text-xs tracking-[0.08em] text-text-dim transition-colors duration-300 hover:text-accent"
                         >
                           <span>Visit site</span>
                           <span aria-hidden="true">↗</span>
@@ -69,7 +69,7 @@ export default function Projects() {
                           href={project.repoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                          className="inline-flex items-center gap-1.5 font-mono text-xs tracking-[0.08em] text-text-dim transition-colors duration-300 hover:text-accent"
                         >
                           <span>GitHub</span>
                           <span aria-hidden="true">↗</span>
@@ -80,7 +80,7 @@ export default function Projects() {
                           href={project.feedbackUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-text-dim transition-colors duration-300 hover:text-accent"
+                          className="inline-flex items-center gap-1.5 font-mono text-xs tracking-[0.08em] text-text-dim transition-colors duration-300 hover:text-accent"
                         >
                           <span>Feedback</span>
                           <span aria-hidden="true">↗</span>

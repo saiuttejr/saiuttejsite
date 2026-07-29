@@ -63,7 +63,7 @@ export default function ChessEasterEgg() {
       <div className="pointer-events-auto w-[15rem] rounded-[1.4rem] border border-white/10 bg-black/55 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-[10px] tracking-[0.14em] text-text-dim">
+            <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
               Chess side quest
             </p>
             <p className="mt-2 text-[0.95rem] leading-[1.6] text-text">
@@ -74,7 +74,7 @@ export default function ChessEasterEgg() {
             href={socialLinks.lichess}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-underline font-mono text-[10px] tracking-[0.14em] text-text-muted hover:text-text"
+            className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted hover:text-text"
           >
             Lichess ↗
           </a>

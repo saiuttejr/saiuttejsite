@@ -23,18 +23,18 @@ export default function Certifications() {
               >
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
                   <h3 className="card-heading">{cert.name}</h3>
-                  <span className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                  <span className="font-mono text-xs tracking-[0.08em] text-text-dim">
                     {cert.date}
                   </span>
                 </div>
-                <p className="mt-2 font-mono text-[10px] tracking-[0.12em] text-accent">
+                <p className="mt-2 font-mono text-xs tracking-[0.08em] text-accent">
                   {cert.issuer}
                 </p>
                 <a
                   href={cert.verifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-underline mt-4 inline-block font-mono text-[10px] tracking-[0.12em] text-text-muted transition-colors duration-300 hover:text-text"
+                  className="link-underline mt-4 inline-block font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
                   data-cursor-hover
                   data-cursor-label="verify"
                 >

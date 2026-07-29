@@ -70,7 +70,7 @@ export default function Hero() {
         <div className="w-full pb-8 pt-10 md:pb-10 md:pt-14">
           <div className="hero-reveal flex flex-wrap items-center gap-4">
             <span className="section-kicker">Sai Uttej Rajoju</span>
-            <span className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+            <span className="font-mono text-xs tracking-[0.08em] text-text-dim">
               software engineer · Hyderabad
             </span>
           </div>
@@ -113,7 +113,7 @@ export default function Hero() {
                 </a>
                 <a
                   href={`mailto:${socialLinks.email}`}
-                  className="link-underline font-mono text-[10px] tracking-[0.12em] text-text-muted transition-colors duration-300 hover:text-text"
+                  className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
                   data-cursor-hover
                   data-cursor-label="email"
                 >
@@ -125,7 +125,7 @@ export default function Hero() {
             <div className="hero-reveal lg:pt-6">
               <div className="space-y-6 border-t border-line pt-5 lg:border-t-0 lg:border-l lg:pl-8 lg:pt-0">
                 <div>
-                  <p className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
                     Current role
                   </p>
                   <p className="mt-2 text-[1rem] leading-[1.72] text-text">
@@ -134,7 +134,7 @@ export default function Hero() {
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
                     Lately
                   </p>
                   <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
@@ -143,7 +143,7 @@ export default function Hero() {
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
                     Own projects
                   </p>
                   <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
@@ -152,7 +152,7 @@ export default function Hero() {
                 </div>
 
                 <div>
-                  <p className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
                     Away from work
                   </p>
                   <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
