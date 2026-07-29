@@ -18,7 +18,7 @@ export default function Certifications() {
           <div className="divide-y divide-line">
             {certifications.map((cert) => (
               <div
-                key={cert.credentialId}
+                key={cert.name}
                 className="py-6 first:pt-0 last:pb-0 md:py-7"
               >
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">

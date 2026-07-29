@@ -102,7 +102,7 @@ export default function ProjectDetailContent({ project }: ProjectDetailContentPr
                   Stack
                 </p>
                 <p className="mt-2 text-[0.96rem] leading-[1.8] text-text-muted">
-                  {project.tech}
+                  {project.stack.join(" · ")}
                 </p>
               </div>
 
