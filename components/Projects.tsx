@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { projects } from "@/lib/constants";
+import ProjectCover from "@/components/ProjectCover";
 
 export default function Projects() {
   return (
@@ -9,8 +10,8 @@ export default function Projects() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <span className="section-kicker">Work</span>
             <p className="mt-4 max-w-[16rem] text-[0.95rem] leading-[1.82] text-text-muted">
-              A few projects that reflect how I think, build, and follow
-              through.
+              A few things I&apos;ve built end to end — how I think, ship, and
+              follow through.
             </p>
           </div>
 
@@ -21,15 +22,16 @@ export default function Projects() {
                 data-tone={project.slug}
                 className="group py-8 first:pt-0 md:py-10"
               >
-                <div className="grid gap-5 lg:grid-cols-[110px_minmax(0,1fr)_220px] lg:items-start lg:gap-8">
-                  <div className="flex items-baseline gap-3 text-text-dim lg:flex-col lg:gap-2">
-                    <span className="font-display text-[1.3rem] leading-none tracking-[0.14em]">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="font-mono text-[10px] tracking-[0.12em]">
-                      {project.year}
-                    </span>
-                  </div>
+                <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_180px] lg:items-start lg:gap-8">
+                  <Link
+                    href={`/work/${project.slug}`}
+                    aria-label={`View ${project.name} case study`}
+                    className="block"
+                    data-cursor-hover
+                    data-cursor-label="case study"
+                  >
+                    <ProjectCover project={project} index={index} />
+                  </Link>
 
                   <div>
                     <p className="font-mono text-[10px] tracking-[0.12em] tone-text">

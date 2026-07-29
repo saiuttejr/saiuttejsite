@@ -37,7 +37,7 @@ export const projects: Project[] = [
     featured: true,
     tagline: "Nutrition data for Indian food",
     summary:
-      "3,300+ Indian and global foods in one searchable database. Includes a calorie tracker and Nutri-Score grading. Play Store and B2B API coming soon.",
+      "3,300+ Indian and global foods in one searchable database, with natural-language meal logging powered by Gemini. Calorie tracking and Nutri-Score grading built in. Play Store and B2B API coming soon.",
     description:
       "3,300+ Indian and global foods with Nutri-Score grading and a daily calorie tracker. A full-stack Turborepo monorepo spanning web, mobile (coming soon), and a B2B API (coming soon).",
     tech: "Next.js 15 · React Native · Hono · Supabase",
@@ -305,7 +305,7 @@ export const socialLinks = {
 export const siteMetadata = {
   title: "Sai Uttej Rajoju — Software Engineer",
   description:
-    "Software engineer focused on backend systems and building useful things.",
+    "Software engineer working across backend systems and AI/agent tooling — and building useful things.",
   url: "https://saiuttej.com",
   ogImage: "/opengraph-image",
 };

@@ -57,6 +57,9 @@ export const metadata: Metadata = {
   keywords: [
     "software engineer",
     "backend engineer",
+    "AI engineer",
+    "AI agents",
+    "Azure AI",
     "product builder",
     "platform tooling",
     "systems design",
@@ -98,7 +101,7 @@ const structuredData = {
       name: siteMetadata.title,
       url: siteMetadata.url,
       email: `mailto:${socialLinks.email}`,
-      jobTitle: "Software Engineer and Product Builder",
+      jobTitle: "Backend & AI/Agent Engineer, Product Builder",
       address: {
         "@type": "PostalAddress",
         addressLocality: "Hyderabad",

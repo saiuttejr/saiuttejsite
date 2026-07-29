@@ -11,7 +11,7 @@ export default function Certifications() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <span className="section-kicker">Credentials</span>
             <p className="mt-4 max-w-[16rem] text-[0.95rem] leading-[1.82] text-text-muted">
-              Verified certifications, kept current.
+              Verified certifications backing the AI and agent work.
             </p>
           </div>
 

@@ -20,9 +20,10 @@ export default function About() {
               </h2>
 
               <p className="section-prose mt-6 max-w-[36rem]">
-                The part I usually enjoy most is where engineering quality meets
-                product usefulness. I want the system to hold up, but I also
-                want it to feel considered when someone actually uses it.
+                The part I enjoy most is where engineering quality meets product
+                usefulness. Lately that means more time in AI and agent tooling
+                — making sure the smart layer on top still rests on systems that
+                are clear, dependable, and easy to reason about.
               </p>
 
               <div className="mt-10 border-t border-line pt-6">

@@ -85,14 +85,15 @@ export default function Hero() {
                 </span>
                 <span className="mt-1 block overflow-hidden">
                   <span className="hero-title-line block font-editorial text-[clamp(2.8rem,10vw,6.2rem)] leading-[0.94] tracking-[-0.06em] text-[#dce5ef]">
-                    with a product sense.
+                    and the agents on top.
                   </span>
                 </span>
               </h1>
 
               <p className="hero-reveal mt-7 max-w-[36rem] text-[1rem] leading-[1.92] text-text-muted md:text-[1.04rem]">
-                I work on backend services at MAQ Software, and I build a few
-                things of my own when an idea feels worth pursuing.
+                By day, backend services at MAQ Software. Lately I&apos;ve been
+                building a layer up — the AI and agent systems that sit on top —
+                and on the side, I ship products of my own.
               </p>
 
               <div className="hero-reveal mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -129,6 +130,15 @@ export default function Hero() {
                   </p>
                   <p className="mt-2 text-[1rem] leading-[1.72] text-text">
                     Software Engineer 1 at MAQ Software.
+                  </p>
+                </div>
+
+                <div>
+                  <p className="font-mono text-[10px] tracking-[0.12em] text-text-dim">
+                    Lately
+                  </p>
+                  <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
+                    Building with Azure AI and agent tooling.
                   </p>
                 </div>
 

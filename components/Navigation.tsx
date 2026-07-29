@@ -123,7 +123,7 @@ export default function Navigation() {
               <span
                 className={`hidden overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.12em] text-text-dim transition-all duration-500 md:block ${scrolled ? "max-h-0 max-w-0 opacity-0" : "max-h-8 max-w-[360px] opacity-100"}`}
               >
-                backend systems · product-minded builds
+                backend · ai agents · product builds
               </span>
             </a>
 

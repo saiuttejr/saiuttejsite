@@ -40,8 +40,9 @@ export default function Contact() {
             </h2>
 
             <p className="section-prose mt-6 max-w-[36rem]">
-              I&apos;m open to backend and product engineering roles, especially the
-              kind where clarity, ownership, and taste are all part of the job.
+              I&apos;m open to backend, AI/agent, and product engineering roles —
+              especially the kind where clarity, ownership, and taste are all
+              part of the job.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -151,7 +152,7 @@ export default function Contact() {
                 Best fit
               </p>
               <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                Backend engineering, product engineering, and small-team
+                Backend engineering, AI and agent systems, and small-team
                 ownership.
               </p>
             </div>
