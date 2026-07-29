@@ -108,8 +108,6 @@ export default function MagneticCursor() {
     const label = labelRef.current;
     if (!cursor) return;
 
-    document.body.classList.add("cursor-enhanced");
-
     /* ----- Canvas setup (F1 trail) ----- */
     let ctx: CanvasRenderingContext2D | null = null;
     let resizeHandler: (() => void) | null = null;
@@ -416,18 +414,13 @@ export default function MagneticCursor() {
       document.removeEventListener("mouseover", onPointerOver);
       document.removeEventListener("mouseout", onPointerOut);
       if (resizeHandler) window.removeEventListener("resize", resizeHandler);
-      document.body.classList.remove("cursor-enhanced");
     };
   }, [isWorkPage]);
 
   return (
-    <>
+    <div className="cursor-layer" aria-hidden="true">
       {!isWorkPage && (
-        <canvas
-          ref={canvasRef}
-          className="cursor-trail-canvas"
-          aria-hidden="true"
-        />
+        <canvas ref={canvasRef} className="cursor-trail-canvas" tabIndex={-1} />
       )}
       <div ref={cursorRef} className={isWorkPage ? "cursor-caret" : "cursor-f1"}>
         {isWorkPage ? (
@@ -437,6 +430,6 @@ export default function MagneticCursor() {
         )}
         <span ref={labelRef} className="cursor-label" />
       </div>
-    </>
+    </div>
   );
 }

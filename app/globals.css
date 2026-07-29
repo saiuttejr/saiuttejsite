@@ -23,6 +23,13 @@
   --color-panel-border: rgba(233, 239, 247, 0.1);
   --color-panel-shadow: rgba(0, 0, 0, 0.42);
 
+  /* Focus ring — 6.50:1 against #06080d, clears the 3:1 required by SC 1.4.11. */
+  --color-focus: #ff7a45;
+  --color-focus-halo: rgba(255, 122, 69, 0.28);
+
+  /* Height reserved for the fixed nav pill, used by scroll-margin-top. */
+  --nav-offset: 7.5rem;
+
   --font-body: var(--font-sora);
   --font-display: var(--font-sora);
   --font-mono: var(--font-jetbrains-mono);
@@ -130,6 +137,70 @@ nav {
 
 a {
   color: inherit;
+}
+
+/* ==========================================================================
+   Focus visibility  (WCAG 2.2 — 2.4.7 Focus Visible, 2.4.11 Focus Not Obscured,
+   2.4.13 Focus Appearance)
+   ========================================================================== */
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Ensure the ring reads against both dark surfaces and light/accent fills. */
+:where(.button-primary, .nav-pill a, .nav-pill button):focus-visible {
+  outline-color: var(--color-focus);
+  box-shadow: 0 0 0 4px var(--color-focus-halo);
+}
+
+/* Never rely on the UA default only to then remove it. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 2.4.11 — a focused anchor target must not end up under the fixed nav pill. */
+:where([id]) {
+  scroll-margin-top: var(--nav-offset);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100000;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  background: var(--color-ink);
+  color: #0b0e12;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transform: translateY(calc(-100% - 1.5rem));
+  transition: transform 0.18s var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.cursor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
 }
 
 .cursor-trail-canvas {
@@ -280,29 +351,24 @@ a {
   50% { opacity: 0.6; transform: scaleY(0.95); }
 }
 
-body.cursor-enhanced,
-body.cursor-enhanced a,
-body.cursor-enhanced button,
-body.cursor-enhanced [role="button"] {
-  cursor: none !important;
-}
+/* The custom cursor is purely additive: the native cursor is never hidden, so
+   pointer affordances (text I-beam, resize, disabled) stay intact. */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 
-  body {
-    scroll-behavior: auto;
+  .cursor-layer {
+    display: none;
   }
 }
 
 @media (pointer: coarse) {
-  .cursor-trail-canvas,
-  .cursor-f1,
-  .cursor-caret {
+  .cursor-layer {
     display: none;
   }
 }
@@ -556,6 +622,26 @@ body.cursor-enhanced [role="button"] {
   opacity: 0;
 }
 
+.f1-skip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.7rem 1.25rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.f1-skip:hover {
+  border-color: var(--color-focus);
+  color: var(--color-ink);
+}
+
 .f1-lights-row {
   display: flex;
   gap: clamp(1rem, 3vw, 2.5rem);
@@ -646,13 +732,26 @@ body.cursor-enhanced [role="button"] {
 
 .nav-overlay {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-out),
+    visibility 0s linear 0.3s;
   background:
     radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.08), transparent 24%),
     radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.05), transparent 24%),
     rgba(4, 7, 10, 0.92);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
+}
+
+.nav-overlay--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 0.35s var(--ease-out),
+    visibility 0s;
 }
 
 [data-tone="eatensity"] .tone-text {

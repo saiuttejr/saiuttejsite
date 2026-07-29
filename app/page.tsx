@@ -8,7 +8,7 @@ import F1StartLights from "@/components/F1StartLights";
 
 export default function Home() {
   return (
-    <main className="site-stage">
+    <main id="main" className="site-stage">
       <F1StartLights />
       <Navigation />
       <Hero />

@@ -129,6 +129,9 @@ export default function RootLayout({
       className={`${syne.variable} ${sora.variable} ${jetbrainsMono.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <div className="grain-overlay" aria-hidden="true" />
         {children}
         <ChessEasterEgg />

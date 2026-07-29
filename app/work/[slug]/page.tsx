@@ -43,7 +43,7 @@ export default async function ProjectPage({ params }: PageProps) {
   }
 
   return (
-    <main className="site-stage min-h-screen bg-transparent">
+    <main id="main" className="site-stage min-h-screen bg-transparent">
       <nav className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 md:px-8 lg:px-12">
         <div className="editorial-shell">
           <div className="nav-pill nav-pill--glass flex items-center justify-between gap-4 px-4 py-3.5 md:px-5 md:py-4">

@@ -1,79 +1,86 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const LIGHT_COUNT = 5;
-const LIGHT_ON_INTERVAL = 600;
-const LIGHTS_OUT_DELAY = 800;
-const FADE_DURATION = 600;
+const LIGHT_ON_INTERVAL = 180;
+const LIGHTS_OUT_DELAY = 260;
+const FADE_DURATION = 360;
+const STORAGE_KEY = "f1-intro-played";
+
+type Phase = "idle" | "running" | "done";
 
 export default function F1StartLights() {
+  const [phase, setPhase] = useState<Phase>("idle");
   const [activeLights, setActiveLights] = useState(0);
   const [lightsOut, setLightsOut] = useState(false);
-  const [done, setDone] = useState(false);
-  const checkedRef = useRef(false);
-  const skipRef = useRef(false);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const skipRef = useRef<HTMLButtonElement>(null);
 
-  // On mount: check localStorage. If already played, mark done immediately.
-  // We use refs + a single setState to avoid the "loading → null → running → overlay" flash.
+  const finish = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    setPhase("done");
+    try {
+      localStorage.setItem(STORAGE_KEY, "1");
+    } catch {
+      // storage unavailable — the intro simply plays again next visit
+    }
+  }, []);
+
+  // Renders nothing on the server and on first paint, so the overlay can never
+  // become the LCP element or delay it.
   useEffect(() => {
-    if (checkedRef.current) return;
-    checkedRef.current = true;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPhase("done");
+      return;
+    }
 
     try {
-      if (localStorage.getItem("f1-intro-played") === "1") {
-        skipRef.current = true;
-        setDone(true);
+      if (localStorage.getItem(STORAGE_KEY) === "1") {
+        setPhase("done");
         return;
       }
     } catch {
       // storage unavailable — play the animation
     }
 
-    // Start the light sequence
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    setPhase("running");
 
+    const timers = timersRef.current;
     for (let i = 1; i <= LIGHT_COUNT; i++) {
-      timers.push(
-        setTimeout(() => setActiveLights(i), i * LIGHT_ON_INTERVAL)
-      );
+      timers.push(setTimeout(() => setActiveLights(i), i * LIGHT_ON_INTERVAL));
     }
 
     const allOnTime = LIGHT_COUNT * LIGHT_ON_INTERVAL + LIGHTS_OUT_DELAY;
     timers.push(setTimeout(() => setLightsOut(true), allOnTime));
+    timers.push(setTimeout(finish, allOnTime + FADE_DURATION));
 
-    timers.push(
-      setTimeout(() => {
-        setDone(true);
-        try {
-          localStorage.setItem("f1-intro-played", "1");
-        } catch {
-          // ignore
-        }
-      }, allOnTime + FADE_DURATION)
-    );
-
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  // Lock scroll while overlay is visible
-  useEffect(() => {
-    if (done || skipRef.current) return;
-    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      timers.forEach(clearTimeout);
+      timersRef.current = [];
     };
-  }, [done]);
+  }, [finish]);
 
-  if (done) return null;
+  // Move focus to the skip control so keyboard users are never stuck behind it.
+  useEffect(() => {
+    if (phase === "running") skipRef.current?.focus();
+  }, [phase]);
 
-  // Overlay renders from the FIRST frame — covers everything until lights out
+  useEffect(() => {
+    if (phase !== "running") return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") finish();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [phase, finish]);
+
+  if (phase !== "running") return null;
+
   return (
-    <div
-      className={`f1-start-overlay${lightsOut ? " f1-start-fade" : ""}`}
-      aria-hidden="true"
-    >
-      <div className="f1-lights-row">
+    <div className={`f1-start-overlay${lightsOut ? " f1-start-fade" : ""}`}>
+      <div className="f1-lights-row" aria-hidden="true">
         {Array.from({ length: LIGHT_COUNT }, (_, i) => (
           <div key={i} className="f1-light-column">
             <div
@@ -85,6 +92,10 @@ export default function F1StartLights() {
           </div>
         ))}
       </div>
+
+      <button ref={skipRef} type="button" className="f1-skip" onClick={finish}>
+        Skip intro
+      </button>
     </div>
   );
 }
