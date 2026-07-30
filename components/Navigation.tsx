@@ -6,7 +6,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const navItems = [
-  { label: "Projects", href: "#work" },
+  { label: "Work", href: "#work" },
+  { label: "Approach", href: "#approach" },
   { label: "Timeline", href: "#about" },
 ];
 
@@ -158,18 +159,23 @@ export default function Navigation() {
               </a>
             </div>
 
-            <button
-              ref={toggleRef}
-              className="button-secondary min-w-[3.8rem] px-3 py-1.5 md:hidden"
-              onClick={() => setMenuOpen((open) => !open)}
-              type="button"
-              aria-controls="mobile-navigation"
-              aria-expanded={menuOpen}
-              data-cursor-hover
-              data-cursor-label="menu"
-            >
-              {menuOpen ? "Close" : "Menu"}
-            </button>
+            {/* The hidden utility lives on the wrapper: `.button-secondary` sets
+                `display` from unlayered CSS, which outranks Tailwind's utilities
+                layer and would defeat `md:hidden` on the button itself. */}
+            <div className="md:hidden">
+              <button
+                ref={toggleRef}
+                className="button-secondary min-w-[3.8rem] px-3 py-1.5"
+                onClick={() => setMenuOpen((open) => !open)}
+                type="button"
+                aria-controls="mobile-navigation"
+                aria-expanded={menuOpen}
+                data-cursor-hover
+                data-cursor-label="menu"
+              >
+                {menuOpen ? "Close" : "Menu"}
+              </button>
+            </div>
           </div>
         </div>
       </nav>

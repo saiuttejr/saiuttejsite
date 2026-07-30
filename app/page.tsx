@@ -1,8 +1,9 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
-import About from "@/components/About";
-import Certifications from "@/components/Certifications";
+import Approach from "@/components/Approach";
+import Timeline from "@/components/Timeline";
+import Signals from "@/components/Signals";
 import Contact from "@/components/Contact";
 import F1StartLights from "@/components/F1StartLights";
 
@@ -13,8 +14,9 @@ export default function Home() {
       <Navigation />
       <Hero />
       <Projects />
-      <About />
-      <Certifications />
+      <Approach />
+      <Timeline />
+      <Signals />
       <Contact />
     </main>
   );

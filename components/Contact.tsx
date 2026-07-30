@@ -1,122 +1,104 @@
+import Link from "next/link";
 import { socialLinks } from "@/lib/constants";
+
+const elsewhere = [
+  { label: "LinkedIn", href: socialLinks.linkedin },
+  { label: "GitHub", href: socialLinks.github },
+  { label: "Lichess", href: socialLinks.lichess },
+  { label: "Résumé", href: socialLinks.resume },
+];
 
 export default function Contact() {
   return (
-    <footer id="contact" className="relative px-4 py-6 md:px-8 md:py-10 lg:px-12">
-      <div className="editorial-shell pb-8 md:pb-10">
-        <div className="relative grid gap-10 border-t border-line pt-10 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-14">
-          <div className="absolute left-[10%] top-0 h-[14rem] w-[14rem] bg-[radial-gradient(circle,_rgba(240,91,43,0.12),_transparent_64%)] blur-3xl" aria-hidden="true" />
+    <footer id="contact" className="relative px-4 pb-12 pt-20 md:px-8 md:pb-16 md:pt-28 lg:px-12">
+      <div className="editorial-shell">
+        {/* The closing statement is the only element at hero scale below the
+            fold — the page opens and closes on the same note. */}
+        <div className="contact-close">
+          <span className="section-kicker">Contact</span>
+          <h2 className="section-heading mt-8 max-w-[18ch]">
+            If something here feels aligned, get in touch.
+          </h2>
 
-          <div className="relative">
-            <span className="section-kicker">Contact</span>
+          <p className="section-prose mt-8">
+            I&apos;m open to backend, AI/agent, and product engineering roles —
+            especially the kind where clarity, ownership, and taste are all part
+            of the job.
+          </p>
 
-            <h2 className="section-heading mt-4 max-w-4xl">
-              If something here feels aligned, get in touch.
-            </h2>
+          <p className="mt-10">
+            <a
+              href={`mailto:${socialLinks.email}`}
+              className="button-primary"
+              data-cursor-hover
+              data-cursor-label="email"
+            >
+              {socialLinks.email}
+            </a>
+          </p>
+        </div>
 
-            <p className="section-prose mt-6 max-w-[36rem]">
-              I&apos;m open to backend, AI/agent, and product engineering roles —
-              especially the kind where clarity, ownership, and taste are all
-              part of the job.
+        <div className="site-footer">
+          <div>
+            <p className="label">Sai Uttej Rajoju</p>
+            <p className="mt-2 text-sm text-text-secondary">
+              Backend and AI/agent engineering. Hyderabad, India.
             </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <a
-                href={`mailto:${socialLinks.email}`}
-                className="button-primary"
-                data-cursor-hover
-                data-cursor-label="email"
-              >
-                Email
-              </a>
-              <a
-                href={socialLinks.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
-                data-cursor-hover
-                data-cursor-label="linkedin"
-              >
-                LinkedIn ↗
-              </a>
-              <a
-                href={socialLinks.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
-                data-cursor-hover
-                data-cursor-label="github"
-              >
-                GitHub ↗
-              </a>
-              <a
-                href={socialLinks.lichess}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
-                data-cursor-hover
-                data-cursor-label="lichess"
-              >
-                Lichess ↗
-              </a>
-              <a
-                href={socialLinks.resume}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
-                data-cursor-hover
-                data-cursor-label="resume"
-              >
-                Resume ↗
-              </a>
-            </div>
           </div>
 
-          <div className="space-y-6 border-t border-line pt-5 lg:border-t-0 lg:border-l lg:pl-8 lg:pt-0">
-            <div>
-              <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                Based in
-              </p>
-              <p className="mt-2 text-[0.98rem] leading-[1.78] text-text">
-                Hyderabad, India
-              </p>
-            </div>
+          <nav aria-label="Footer">
+            <p className="label">Pages</p>
+            <ul className="mt-3 space-y-2">
+              <li>
+                <Link href="/work" className="footer-link">
+                  Work
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="footer-link">
+                  About
+                </Link>
+              </li>
+              <li>
+                <a href="#main" className="footer-link">
+                  Back to top
+                </a>
+              </li>
+            </ul>
+          </nav>
 
-            <div>
-              <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                Working at
-              </p>
-              <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                MAQ Software
-              </p>
-            </div>
+          <div>
+            <p className="label">Elsewhere</p>
+            <ul className="mt-3 space-y-2">
+              {elsewhere.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-link"
+                    data-cursor-hover
+                    data-cursor-label={item.label.toLowerCase()}
+                  >
+                    {item.label} ↗
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                Best fit
-              </p>
-              <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                Backend engineering, AI and agent systems, and small-team
-                ownership.
-              </p>
-            </div>
-
-            <div>
-              <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                Off the clock
-              </p>
-              <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                Chess, anime, F1, and time around bikes and cars.
-              </p>
-            </div>
-
-            <div className="border-t border-line pt-4">
-              <span className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                © 2026 Sai Uttej Rajoju
-              </span>
-            </div>
+          <div>
+            <p className="label">Colophon</p>
+            <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+              Set in Instrument Serif and Sora. Built with Next.js. Motion
+              respects your reduced-motion setting.
+            </p>
           </div>
         </div>
+
+        <p className="label mt-12 border-t border-line pt-6">
+          © 2026 Sai Uttej Rajoju
+        </p>
       </div>
     </footer>
   );

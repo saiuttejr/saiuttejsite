@@ -61,109 +61,70 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="section-screen px-4 pt-24 pb-8 md:px-8 md:pt-28 md:pb-10 lg:px-12"
+      className="section-screen px-4 pt-28 pb-10 md:px-8 md:pt-32 lg:px-12"
     >
-      <div className="absolute inset-x-0 top-[16%] h-[18rem] bg-[radial-gradient(circle,_rgba(143,200,234,0.12),_transparent_62%)] blur-3xl" aria-hidden="true" />
-      <div className="absolute right-[-8%] top-[38%] h-[20rem] w-[20rem] bg-[radial-gradient(circle,_rgba(240,91,43,0.11),_transparent_62%)] blur-3xl" aria-hidden="true" />
+      <div className="hero-glow" aria-hidden="true" />
 
-      <div className="editorial-shell flex min-h-[calc(100svh-6rem)] items-end">
-        <div className="w-full pb-8 pt-10 md:pb-10 md:pt-14">
-          <div className="hero-reveal flex flex-wrap items-center gap-4">
+      <div className="editorial-shell flex min-h-[calc(100svh-9rem)] flex-col justify-between gap-14">
+        <div className="pt-6 md:pt-10">
+          <div className="hero-reveal flex flex-wrap items-baseline gap-x-5 gap-y-2">
             <span className="section-kicker">Sai Uttej Rajoju</span>
-            <span className="font-mono text-xs tracking-[0.08em] text-text-dim">
-              software engineer · Hyderabad
-            </span>
+            <span className="label">Software engineer · Hyderabad, India</span>
           </div>
 
-          <div className="mt-8 grid gap-10 border-t border-line pt-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(260px,0.72fr)] lg:gap-14 lg:pt-10">
-            <div className="max-w-[44rem]">
-              <h1 className="text-text">
-                <span className="block overflow-hidden">
-                  <span className="hero-title-line block font-editorial text-[clamp(2.8rem,10vw,6.2rem)] leading-[0.94] tracking-[-0.06em]">
-                    Backend systems,
-                  </span>
-                </span>
-                <span className="mt-1 block overflow-hidden">
-                  <span className="hero-title-line block font-editorial text-[clamp(2.8rem,10vw,6.2rem)] leading-[0.94] tracking-[-0.06em] text-[#dce5ef]">
-                    and the agents on top.
-                  </span>
-                </span>
-              </h1>
+          <h1 className="display-xl mt-10 max-w-[15ch]">
+            <span className="block overflow-hidden">
+              <span className="hero-title-line block">Backend systems,</span>
+            </span>
+            <span className="mt-1 block overflow-hidden">
+              <span className="hero-title-line block">
+                and the <em className="hero-em">agents</em> on top.
+              </span>
+            </span>
+          </h1>
 
-              <p className="hero-reveal mt-7 max-w-[36rem] text-[1rem] leading-[1.92] text-text-muted md:text-[1.04rem]">
-                By day, backend services at MAQ Software. Lately I&apos;ve been
-                building a layer up — the AI and agent systems that sit on top —
-                and on the side, I ship products of my own.
-              </p>
+          <p className="hero-reveal hero-lede mt-10">
+            By day, backend services at MAQ Software. Lately I&apos;ve been
+            building a layer up — the AI and agent systems that sit on top —
+            and on the side, I ship products of my own.
+          </p>
 
-              <div className="hero-reveal mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <a
-                  href="#work"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document
-                      .querySelector("#work")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="button-primary"
-                  data-cursor-hover
-                  data-cursor-label="work"
-                >
-                  Selected work
-                </a>
-                <a
-                  href={`mailto:${socialLinks.email}`}
-                  className="link-underline font-mono text-xs tracking-[0.08em] text-text-muted transition-colors duration-300 hover:text-text"
-                  data-cursor-hover
-                  data-cursor-label="email"
-                >
-                  {socialLinks.email}
-                </a>
-              </div>
-            </div>
-
-            <div className="hero-reveal lg:pt-6">
-              <div className="space-y-6 border-t border-line pt-5 lg:border-t-0 lg:border-l lg:pl-8 lg:pt-0">
-                <div>
-                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                    Current role
-                  </p>
-                  <p className="mt-2 text-[1rem] leading-[1.72] text-text">
-                    Software Engineer 1 at MAQ Software.
-                  </p>
-                </div>
-
-                <div>
-                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                    Lately
-                  </p>
-                  <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                    Building with Azure AI and agent tooling.
-                  </p>
-                </div>
-
-                <div>
-                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                    Own projects
-                  </p>
-                  <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                    Eatensity, figuretools, and Kanso.
-                  </p>
-                </div>
-
-                <div>
-                  <p className="font-mono text-xs tracking-[0.08em] text-text-dim">
-                    Away from work
-                  </p>
-                  <p className="mt-2 text-[0.98rem] leading-[1.78] text-text-muted">
-                    Usually chess on <a href={socialLinks.lichess} target="_blank" rel="noopener noreferrer" className="link-underline text-text" data-cursor-hover data-cursor-label="lichess">Lichess</a>, anime,
-                    F1 weekends, and anything with two or four wheels.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="hero-reveal mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <a
+              href="#work"
+              className="button-primary"
+              data-cursor-hover
+              data-cursor-label="work"
+            >
+              Selected work
+            </a>
+            <a
+              href={`mailto:${socialLinks.email}`}
+              className="link-underline label text-text-secondary transition-colors duration-300 hover:text-text-primary"
+              data-cursor-hover
+              data-cursor-label="email"
+            >
+              {socialLinks.email}
+            </a>
           </div>
         </div>
+
+        {/* A masthead rail rather than another sticky-label column, so the hero
+            does not share a layout archetype with any section below it. */}
+        <dl className="hero-reveal hero-rail">
+          <div>
+            <dt className="label">Now</dt>
+            <dd className="hero-rail__value">Software Engineer&nbsp;1, MAQ Software</dd>
+          </div>
+          <div>
+            <dt className="label">Building</dt>
+            <dd className="hero-rail__value">Eatensity, figuretools, Kanso</dd>
+          </div>
+          <div>
+            <dt className="label">Working in</dt>
+            <dd className="hero-rail__value">C#, .NET, Azure AI, TypeScript</dd>
+          </div>
+        </dl>
       </div>
     </section>
   );
