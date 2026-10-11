@@ -5,6 +5,7 @@ const elsewhere = [
   { label: "LinkedIn", href: socialLinks.linkedin },
   { label: "GitHub", href: socialLinks.github },
   { label: "Lichess", href: socialLinks.lichess },
+  { label: "Letterboxd", href: socialLinks.letterboxd },
   { label: "Résumé", href: socialLinks.resume },
 ];
 

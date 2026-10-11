@@ -101,7 +101,7 @@ const structuredData = {
         addressLocality: "Hyderabad",
         addressCountry: "India",
       },
-      sameAs: [socialLinks.linkedin, socialLinks.github, socialLinks.lichess],
+      sameAs: [socialLinks.linkedin, socialLinks.github, socialLinks.lichess, socialLinks.letterboxd],
     },
     {
       "@type": "WebSite",
