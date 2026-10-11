@@ -299,6 +299,7 @@ export const socialLinks = {
   linkedin: "https://linkedin.com/in/sai-uttej-r",
   github: "https://github.com/saiuttejr",
   lichess: "https://lichess.org/@/Haccnt",
+  letterboxd: "https://letterboxd.com/contra156/",
   resume: "https://drive.google.com/file/d/1pUT97nHqqqfiRdWjdZq5edfEZPZA3wtG/view?usp=drive_link",
 };
 

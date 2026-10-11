@@ -115,6 +115,16 @@ export default function Contact() {
                 Lichess ↗
               </a>
               <a
+                href={socialLinks.letterboxd}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline font-mono text-[10px] tracking-[0.12em] text-text-muted transition-colors duration-300 hover:text-text"
+                data-cursor-hover
+                data-cursor-label="letterboxd"
+              >
+                Letterboxd ↗
+              </a>
+              <a
                 href={socialLinks.resume}
                 target="_blank"
                 rel="noopener noreferrer"

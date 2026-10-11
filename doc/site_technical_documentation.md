@@ -216,7 +216,7 @@ Renders sections in order:
 
 ### Contact
 
-- Social links: Email (primary button), LinkedIn, GitHub, Lichess
+- Social links: Email (primary button), LinkedIn, GitHub, Lichess, Letterboxd
 - **LinkedIn badge popover**: lazy-loads `platform.linkedin.com/badges/js/profile.js` on first hover; badge hidden after 200ms on mouseout; popover stays if mouse enters it
 - **Lichess hover**: dispatches `chess-pieces-activate` custom event
 
@@ -343,7 +343,7 @@ interface Project {
 
 - `experience[]` — 2 entries at MAQ Software (Software Engineer 1, Associate)
 - `education` — B.Tech CSE, CVR College, GATE CSE 2024 top 8%
-- `socialLinks` — email, linkedin, github, lichess
+- `socialLinks` — email, linkedin, github, lichess, letterboxd
 - `siteMetadata` — title, description, url, ogImage
 
 ---
