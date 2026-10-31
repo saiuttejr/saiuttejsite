@@ -1,20 +1,25 @@
-# Sai Uttej Rajoju — Personal Site
+# Sai Uttej Rajoju — Personal Website (`saiuttej.com`)
 
-Authority-first portfolio site for a software engineer and product builder. The project is built to present selected work, operating style, and contact intent with a premium editorial tone instead of a template portfolio feel.
+Editorial personal website for **Sai Uttej Rajoju**, built around two distinct modes connected by a live palette and typography morph:
+
+- **Work (`/`) — Warm Ivory & Cobalt**: Scroll-parting editorial cover, a concise statement on engineering work at MAQ Software and verified Microsoft credentials, a four-project open magazine spread (`Eatensity`, `FigureTools`, `FinPulse AI`, `Kanso`) with a live interactive `eatensity.com` preview stage, and direct contact links.
+- **After Hours (`/space`) — Warm Paper & Persimmon**: Off-the-clock space with a frameless Formula 1 five-lights reflex test, playable mate-in-one chess puzzles, and quiet footer links to Letterboxd, MyAnimeList, and Goodreads.
 
 ## Stack
 
 - Next.js 16 App Router
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- Local font loading via `next/font/local`
+- React 19 + TypeScript 5
+- Tailwind CSS 4 (`@layer base` and `@layer components`)
+- Self-hosted variable fonts: **Bricolage**, **Switzer**, and **Sentient** (`public/fonts/`)
+- Satori OpenGraph card generation (`lib/og.tsx` + `app/opengraph-image.tsx`)
+- Node 22 (`.nvmrc`)
 
 ## Commands
 
 ```bash
 npm install
 npm run dev
+npm run typecheck
 npm run lint
 npm run build
 npm run start
@@ -22,24 +27,8 @@ npm run start
 
 ## Structure
 
-- `app/` — routes, layout, metadata routes, and project detail pages
-- `components/` — homepage sections and reusable UI blocks
-- `lib/constants.ts` — site copy, project content, metadata, and supporting structured content
-- `doc/` — design brief and résumé source material
-
-## Current Direction
-
-The current implementation is moving toward:
-
-- clearer authority positioning above the fold
-- stronger proof on project and case-study pages
-- lower interaction overhead and fewer decorative behaviors
-- better metadata, social previews, robots, and sitemap coverage
-
-## Deployment Notes
-
-- `app/robots.ts` and `app/sitemap.ts` generate crawl assets
-- `app/opengraph-image.tsx` and `app/twitter-image.tsx` generate social preview images
-- `app/icon.svg` provides the site icon
-
-Before deploying, verify production metadata, social previews, and performance on mobile hardware.
+- `app/page.tsx` — Work walkthrough (`/`)
+- `app/space/page.tsx` — After Hours walkthrough (`/space`)
+- `components/SiteExperience.tsx` — Unified editorial walkthrough & mode switch
+- `lib/site-data.ts` — Profile links, project index, and credentials
+- `public/Sai_Uttej_Rajoju_Resume.pdf` — Canonical resume PDF
