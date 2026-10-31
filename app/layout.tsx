@@ -1,117 +1,46 @@
-import type { Metadata } from "next";
-import { Sora, Syne, Nunito } from "next/font/google";
-import localFont from "next/font/local";
-import { siteMetadata, socialLinks } from "@/lib/constants";
-import ChessEasterEgg from "@/components/ChessEasterEgg";
-import ChessPieces from "@/components/ChessPieces";
-import CursorLayer from "@/components/CursorLayer";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-
-const syne = Syne({
-  subsets: ["latin"],
-  variable: "--font-syne",
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const sora = Sora({
-  subsets: ["latin"],
-  variable: "--font-sora",
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const jetbrainsMono = localFont({
-  src: [
-    {
-      path: "./fonts/JetBrainsMono-Regular.woff2",
-      weight: "400",
-      style: "normal",
-    },
-  ],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
-
-const nunito = Nunito({
-  subsets: ["latin"],
-  variable: "--font-nunito",
-  weight: ["900"],
-  display: "swap",
-});
+import { SITE_PROFILE } from "@/lib/site-data";
+import { pageMetadata, SITE_URL } from "@/lib/metadata";
+import { MotionRuntime } from "@/components/MotionRuntime";
 
 export const metadata: Metadata = {
-  title: {
-    default: siteMetadata.title,
-    template: `%s | ${siteMetadata.title}`,
-  },
-  description: siteMetadata.description,
-  metadataBase: new URL(siteMetadata.url),
-  applicationName: siteMetadata.title,
-  alternates: {
-    canonical: "/",
-  },
-  authors: [{ name: siteMetadata.title }],
-  creator: siteMetadata.title,
-  publisher: siteMetadata.title,
-  keywords: [
-    "software engineer",
-    "backend engineer",
-    "product builder",
-    "platform tooling",
-    "systems design",
-    "Hyderabad",
-  ],
-  openGraph: {
-    title: siteMetadata.title,
-    description: siteMetadata.description,
-    url: siteMetadata.url,
-    siteName: siteMetadata.title,
-    locale: "en_US",
-    type: "website",
-    images: [
-      {
-        url: siteMetadata.ogImage,
-        width: 1200,
-        height: 630,
-        alt: `${siteMetadata.title} — software engineer and product builder`,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteMetadata.title,
-    description: siteMetadata.description,
-    images: [siteMetadata.ogImage],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  metadataBase: new URL(SITE_URL),
+  ...pageMetadata(),
 };
 
-const structuredData = {
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+};
+
+const personJsonLd = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Person",
-      name: siteMetadata.title,
-      url: siteMetadata.url,
-      email: `mailto:${socialLinks.email}`,
-      jobTitle: "Software Engineer and Product Builder",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Hyderabad",
-        addressCountry: "India",
-      },
-      sameAs: [socialLinks.linkedin, socialLinks.github, socialLinks.lichess, socialLinks.letterboxd],
-    },
-    {
-      "@type": "WebSite",
-      name: siteMetadata.title,
-      url: siteMetadata.url,
-      description: siteMetadata.description,
-    },
+  "@type": "Person",
+  name: SITE_PROFILE.name,
+  jobTitle: SITE_PROFILE.role,
+  url: SITE_URL,
+  email: SITE_PROFILE.links.emailAddress,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Hyderabad",
+    addressCountry: "IN",
+  },
+  worksFor: {
+    "@type": "Organization",
+    name: "MAQ Software",
+  },
+  alumniOf: {
+    "@type": "CollegeOrUniversity",
+    name: "CVR College of Engineering, JNTUH",
+  },
+  sameAs: [
+    SITE_PROFILE.links.github,
+    SITE_PROFILE.links.linkedin,
+    SITE_PROFILE.links.letterboxd,
+    SITE_PROFILE.links.goodreads,
+    SITE_PROFILE.links.myanimelist,
   ],
 };
 
@@ -121,20 +50,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${syne.variable} ${sora.variable} ${jetbrainsMono.variable} ${nunito.variable} h-full antialiased`}
-    >
-      <body className="min-h-full bg-bg">
-        <div className="grain-overlay" aria-hidden="true" />
-        {children}
-        <ChessEasterEgg />
-        <ChessPieces />
-        <CursorLayer />
+    <html lang="en" data-room="work" className="js" suppressHydrationWarning>
+      <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
+      </head>
+      <body>
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <MotionRuntime />
+        {children}
       </body>
     </html>
   );

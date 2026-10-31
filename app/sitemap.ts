@@ -1,21 +1,21 @@
 import type { MetadataRoute } from "next";
-import { projects, siteMetadata } from "@/lib/constants";
+import { SITE_URL } from "@/lib/metadata";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
+  const lastModified = new Date("2026-10-31");
 
   return [
     {
-      url: siteMetadata.url,
+      url: SITE_URL,
       lastModified,
-      changeFrequency: "monthly",
-      priority: 1,
+      changeFrequency: "weekly",
+      priority: 1.0,
     },
-    ...projects.map((project) => ({
-      url: `${siteMetadata.url}/work/${project.slug}`,
+    {
+      url: `${SITE_URL}/space`,
       lastModified,
-      changeFrequency: "monthly" as const,
-      priority: project.featured ? 0.9 : 0.7,
-    })),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ];
 }
