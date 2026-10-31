@@ -1,12 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  CREDENTIALS,
-  PROJECTS,
-  SITE_PROFILE,
-  type EditorialProject,
-} from "@/lib/site-data";
+import { CREDENTIALS, PROJECTS, SITE_PROFILE } from "@/lib/site-data";
 
 type RoomMode = "work" | "space";
 
@@ -101,12 +96,6 @@ export function SiteExperience({ initialRoom }: { initialRoom: RoomMode }) {
   // Scroll-parting cover progress (0 -> 1)
   const [coverProgress, setCoverProgress] = useState(0);
   const coverTrackRef = useRef<HTMLElement | null>(null);
-
-  // Work room: active project in the 4-project spread
-  const [activeProject, setActiveProject] = useState<EditorialProject>(
-    PROJECTS[0]
-  );
-  const [eatensityLive, setEatensityLive] = useState(false);
 
   // Sync document data-room attribute
   useEffect(() => {
@@ -551,131 +540,52 @@ export function SiteExperience({ initialRoom }: { initialRoom: RoomMode }) {
               02 — Selected work
             </p>
 
-            <div className="works-spread">
-              {/* Left: All 4 projects visible simultaneously, zero boxes */}
-              <div
-                className="works-index"
-                data-reveal
-                style={{ ["--i" as string]: 1 }}
-              >
-                {PROJECTS.map((proj) => {
-                  const isActive = activeProject.id === proj.id;
-                  return (
-                    <article
-                      key={proj.id}
-                      className={`work-row${isActive ? " is-active" : ""}`}
-                    >
-                      <span className="work-num">{proj.numeral}.</span>
-                      <div className="work-main">
-                        <div className="work-title-bar">
-                          <h3 className="work-title">
-                            <button
-                              type="button"
-                              onMouseEnter={() => setActiveProject(proj)}
-                              onFocus={() => setActiveProject(proj)}
-                              onClick={() => setActiveProject(proj)}
-                              aria-pressed={isActive}
-                            >
-                              {proj.title}
-                            </button>
-                          </h3>
-                          <div className="editorial-links">
-                            <a
-                              href={proj.primaryHref}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="ed-link ed-link-accent"
-                            >
-                              <span>{proj.primaryLabel}</span>
-                            </a>
-                            {proj.secondaryHref && proj.secondaryLabel && (
-                              <a
-                                href={proj.secondaryHref}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="ed-link"
-                              >
-                                <span>{proj.secondaryLabel}</span>
-                              </a>
-                            )}
-                          </div>
-                        </div>
-
-                        <p className="work-desc">{proj.line}</p>
-                        <p className="work-stack">{proj.stack}</p>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-
-              {/* Right: Frameless editorial visual stage */}
-              <div
-                className="works-stage"
-                data-reveal
-                style={{ ["--i" as string]: 2 }}
-              >
-                <div className="stage-caption-top">
-                  <span style={{ fontWeight: 650 }}>
-                    {activeProject.numeral}. {activeProject.title}
-                  </span>
-
-                  {activeProject.liveIframe ? (
-                    <button
-                      type="button"
-                      className="ed-link ed-link-accent"
-                      onClick={() => setEatensityLive((v) => !v)}
-                    >
-                      <span>
-                        {eatensityLive
-                          ? "Show still preview"
-                          : "Interact live inside page →"}
-                      </span>
-                    </button>
-                  ) : (
-                    <a
-                      href={activeProject.primaryHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ed-link ed-link-accent"
-                    >
-                      <span>{activeProject.primaryLabel}</span>
-                    </a>
-                  )}
-                </div>
-
-                <div className="stage-canvas">
-                  {activeProject.id === "eatensity" && eatensityLive ? (
-                    <iframe
-                      src="https://eatensity.com"
-                      title="Eatensity live application"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      sandbox="allow-scripts allow-same-origin allow-forms"
-                    />
-                  ) : activeProject.image ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={activeProject.image}
-                      width={1200}
-                      height={800}
-                      alt={`${activeProject.title} preview`}
-                    />
-                  ) : (
-                    <div className="stage-poster-sheet">
-                      <span className="beat-numeral" style={{ marginBottom: 0 }}>
-                        {activeProject.numeral} / {activeProject.title}
-                      </span>
-                      <p className="stage-pullquote">
-                        {activeProject.pullQuote}
-                      </p>
-                      <div>
-                        <p className="work-stack">{activeProject.stack}</p>
+            <div
+              className="works-index"
+              data-reveal
+              style={{ ["--i" as string]: 1 }}
+            >
+              {PROJECTS.map((proj) => (
+                <article key={proj.id} className="work-row">
+                  <span className="work-num">{proj.numeral}.</span>
+                  <div className="work-main">
+                    <div className="work-title-bar">
+                      <h3 className="work-title">
+                        <a
+                          href={proj.primaryHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {proj.title}
+                        </a>
+                      </h3>
+                      <div className="editorial-links">
+                        <a
+                          href={proj.primaryHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ed-link ed-link-accent"
+                        >
+                          <span>{proj.primaryLabel}</span>
+                        </a>
+                        {proj.secondaryHref && proj.secondaryLabel && (
+                          <a
+                            href={proj.secondaryHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ed-link"
+                          >
+                            <span>{proj.secondaryLabel}</span>
+                          </a>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
+
+                    <p className="work-desc">{proj.line}</p>
+                    <p className="work-stack">{proj.stack}</p>
+                  </div>
+                </article>
+              ))}
             </div>
           </section>
 
