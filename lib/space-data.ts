@@ -188,16 +188,16 @@ export const SPACE_TILES: readonly SpaceTile[] = [
   },
   {
     kind: "photo",
-    id: "night-lanterns",
+    id: "temple-towers",
     col: "4 / 10",
     row: "9 / 13",
     shape: "wide",
-    position: "50% 35%",
+    position: "50% 45%",
     photo: photo(
-      "night-lanterns",
+      "temple-towers",
       1400,
       1095,
-      "Red lanterns hanging under a glass roof at night"
+      "Two sandstone temple towers under a blue sky with white clouds"
     ),
   },
   {
