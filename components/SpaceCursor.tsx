@@ -13,9 +13,11 @@ interface Mark {
 
 const INTERACTIVE = "a, button, [role='button'], .space-hit";
 
-const FOLLOW = 0.34; // share of the gap to the pointer closed per frame at 60 fps
-const TURN = 0.16; // same, for the heading
-const TURN_MIN = 90; // px/s: slower than this the car keeps its heading
+const FOLLOW = 0.26; // share of the gap to the pointer closed per frame at 60 fps
+const FOLLOW_CALM = 0.55; // reduced motion: a short ease instead of none
+const TURN = 0.14; // same, for the heading
+const TURN_CALM = 0.3; // reduced motion: the car turns quickly
+const TURN_MIN = 110; // px/s: slower than this the car keeps its heading
 const MARK_MIN = 260; // px/s: faster than this the rear tyres leave marks
 const MARK_GAP = 5; // px of travel between two marks
 const MARK_LIFE = 1100; // ms
@@ -39,7 +41,7 @@ export function SpaceCursor() {
     const canvasEl: HTMLCanvasElement = canvas;
     const ctx: CanvasRenderingContext2D = context;
     const html = document.documentElement;
-    const fine = window.matchMedia("(pointer: fine)");
+    const fine = window.matchMedia("(any-pointer: fine)");
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
     const forced = window.matchMedia("(forced-colors: active)");
 
@@ -55,6 +57,7 @@ export function SpaceCursor() {
     let shown = false;
     let hover = false;
     let running = false;
+    let calmMode = calm.matches; // reduced motion: no easing, no tyre marks
     let painted = false;
     let raf = 0;
     let last = 0;
@@ -130,13 +133,13 @@ export function SpaceCursor() {
       const dx = target.x - pos.x;
       const dy = target.y - pos.y;
       const gap = Math.hypot(dx, dy);
-      const k = gap < SNAP ? 1 : 1 - Math.pow(1 - FOLLOW, dt * 60);
+      const k = gap < SNAP ? 1 : 1 - Math.pow(1 - (calmMode ? FOLLOW_CALM : FOLLOW), dt * 60);
       const mx = dx * k;
       const my = dy * k;
       pos.x += mx;
       pos.y += my;
 
-      const blend = 1 - Math.pow(0.65, dt * 60);
+      const blend = 1 - Math.pow(0.7, dt * 60);
       vx += (mx / dt - vx) * blend;
       vy += (my / dt - vy) * blend;
       const speed = Math.hypot(vx, vy);
@@ -144,12 +147,13 @@ export function SpaceCursor() {
       if (speed > TURN_MIN) {
         let diff = (Math.atan2(vy, vx) * 180) / Math.PI - heading;
         diff = ((((diff + 180) % 360) + 360) % 360) - 180;
-        heading += diff * (1 - Math.pow(1 - TURN, dt * 60));
+        const turn = (calmMode ? TURN_CALM : TURN) * (0.35 + 0.65 * clamp((speed - TURN_MIN) / 500));
+        heading += diff * (1 - Math.pow(1 - turn, dt * 60));
         heading = ((((heading + 180) % 360) + 360) % 360) - 180;
       }
       carEl.style.transform = `translate3d(${pos.x.toFixed(2)}px,${pos.y.toFixed(2)}px,0) rotate(${(heading + 90).toFixed(1)}deg)`;
 
-      if (speed > MARK_MIN) {
+      if (!calmMode && speed > MARK_MIN) {
         travelled += Math.hypot(mx, my);
         if (travelled >= MARK_GAP) {
           travelled %= MARK_GAP;
@@ -265,7 +269,12 @@ export function SpaceCursor() {
     }
 
     function sync() {
-      const wanted = fine.matches && !calm.matches && !forced.matches;
+      calmMode = calm.matches;
+      if (calmMode) {
+        marks.length = 0;
+        paint(performance.now());
+      }
+      const wanted = fine.matches && !forced.matches;
       if (wanted && !running) start();
       else if (!wanted && running) stop();
     }

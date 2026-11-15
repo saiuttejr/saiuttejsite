@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { startSmoothScroll } from "@/lib/smooth-scroll";
 
 let consoleGreeted = false;
 
@@ -18,6 +19,8 @@ export function syncThemeColor(room: string | undefined) {
 
 export function MotionRuntime() {
   const pathname = usePathname();
+
+  useEffect(() => startSmoothScroll(), []);
 
   useEffect(() => {
     const root = document.documentElement;

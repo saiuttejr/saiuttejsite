@@ -18,6 +18,20 @@ function el<K extends keyof SVGElementTagNameMap>(
   return node;
 }
 
+/** Writes only when the value differs, so a frame that changes nothing restyles nothing. */
+function put(node: Element, name: string, value: string) {
+  if (node.getAttribute(name) !== value) node.setAttribute(name, value);
+}
+
+/**
+ * A palette colour shared by many shapes. Recolouring a group through an inherited `fill` restyles every
+ * shape inside it; a one-stop gradient paints a solid colour, and recolouring its stop only repaints.
+ */
+function solid(defs: Element, id: string): SVGStopElement {
+  const gradient = el("linearGradient", { id, gradientUnits: "userSpaceOnUse", x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+  return el("stop", {}, gradient);
+}
+
 function createRandom(seed: number) {
   let state = seed >>> 0;
   const next = (): number => {
@@ -31,6 +45,9 @@ function createRandom(seed: number) {
 export interface SceneLayout {
   scale: number;
   visibleWidth: number;
+  visibleHeight: number;
+  /** viewBox y of the top edge of the screen (the view is anchored to the bottom). */
+  top: number;
   left: number;
   right: number;
   wallLeft: number;
@@ -45,6 +62,7 @@ export interface SceneLayout {
 function computeLayout(wall: HTMLElement): SceneLayout {
   const scale = Math.max(window.innerWidth / 1440, window.innerHeight / 900);
   const visibleWidth = window.innerWidth / scale;
+  const visibleHeight = window.innerHeight / scale;
   const left = (1440 - visibleWidth) / 2;
   const right = left + visibleWidth;
   const rect = wall.getBoundingClientRect();
@@ -53,6 +71,8 @@ function computeLayout(wall: HTMLElement): SceneLayout {
   return {
     scale,
     visibleWidth,
+    visibleHeight,
+    top: 900 - visibleHeight,
     left,
     right,
     wallLeft,
@@ -110,15 +130,36 @@ interface Chess {
   tipTo: number;
 }
 
+interface Cloud {
+  e: SVGGElement;
+  bodyColor: SVGStopElement;
+  glow: SVGEllipseElement;
+  x: number;
+  y: number;
+  depth: number;
+  /** 0 high in the sky, 1 sitting on the horizon. */
+  low: number;
+}
+
+interface Lantern {
+  e: SVGGElement;
+  glow: SVGCircleElement;
+  x: number;
+  y: number;
+  depth: number;
+}
+
+/** Windows that light up at the same moment share one group, so a frame writes a few dozen opacities. */
+interface LitGroup {
+  e: SVGGElement;
+  th: number;
+  last: string;
+}
+
 interface SceneRefs {
   layout: SceneLayout;
-  back: SVGSVGElement;
   skyStops: SVGStopElement[];
-  far: SVGGElement;
-  mid: SVGGElement;
-  near: SVGGElement;
-  silhouettes: SVGGElement;
-  charminar: SVGGElement;
+  paint: { far: SVGStopElement; mid: SVGStopElement; near: SVGStopElement; charminar: SVGStopElement };
   farGroup: SVGGElement;
   midGroup: SVGGElement;
   strokers: SVGElement[];
@@ -128,8 +169,11 @@ interface SceneRefs {
   moon: SVGCircleElement;
   stars: SVGGElement;
   twinkle: (readonly [SVGCircleElement, number])[];
+  lit: LitGroup[];
+  clouds: Cloud[];
+  lanterns: Lantern[];
   birdsGroup: SVGGElement;
-  birds: { e: SVGPathElement; dx: number; y: number }[];
+  birds: { e: SVGGElement; dx: number; y: number; scale: number }[];
   kite: SVGGElement;
   kiteBody: SVGGElement;
   kiteString: SVGPathElement;
@@ -137,7 +181,6 @@ interface SceneRefs {
   chess: Chess;
   brush: SVGGElement;
   cat: SVGGElement;
-  catBody: SVGGElement;
   catTail: SVGGElement;
   catEyes: SVGGElement;
   catX: number;
@@ -177,20 +220,27 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
   const { next: R, range: rr } = createRandom(7);
   const L = layout;
 
+  const LIT_STEPS = 28;
+  const litGroups: LitGroup[] = [];
+  const litByParent = new Map<Element, (SVGGElement | undefined)[]>();
+  const litGroup = (parent: Element, th: number): SVGGElement => {
+    const index = Math.min(LIT_STEPS - 1, Math.max(0, Math.round((th / 0.72) * (LIT_STEPS - 1))));
+    let groups = litByParent.get(parent);
+    if (!groups) {
+      groups = [];
+      litByParent.set(parent, groups);
+    }
+    let group = groups[index];
+    if (!group) {
+      group = el("g", { opacity: 0 }, parent);
+      groups[index] = group;
+      litGroups.push({ e: group, th: (index / (LIT_STEPS - 1)) * 0.72, last: "0.00" });
+    }
+    return group;
+  };
+
   const lit = (parent: Element, x: number, y: number, w: number, h: number, th = rr(0.05, 0.7)) =>
-    el(
-      "rect",
-      {
-        x: x.toFixed(1),
-        y: y.toFixed(1),
-        width: w,
-        height: h,
-        rx: 1,
-        class: "space-lit",
-        style: `--th:${th.toFixed(3)}`,
-      },
-      parent
-    );
+    el("rect", { x: x.toFixed(1), y: y.toFixed(1), width: w, height: h, rx: 1 }, litGroup(parent, th));
 
   const hit = (parent: Element, x: number, y: number, w: number, h: number) =>
     el("rect", { x, y, width: w, height: h, fill: "transparent", class: "space-hit" }, parent);
@@ -267,15 +317,11 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
     for (let i = -2; i <= 2; i++) {
       el(
         "path",
-        {
-          d: `M${i * 22 - 5},-34 v-16 a5,5 0 0 1 10,0 v16 z`,
-          class: "space-lit",
-          style: `--th:${(0.1 + Math.abs(i) * 0.05).toFixed(2)}`,
-        },
-        arches
+        { d: `M${i * 22 - 5},-34 v-16 a5,5 0 0 1 10,0 v16 z` },
+        litGroup(arches, 0.1 + Math.abs(i) * 0.05)
       );
     }
-    el("path", { d: "M-11,10 v-30 a11,11 0 0 1 22,0 v30 z", class: "space-lit", style: "--th:.2" }, arches);
+    el("path", { d: "M-11,10 v-30 a11,11 0 0 1 22,0 v30 z" }, litGroup(arches, 0.2));
   }
 
   function stander(g: Element, x: number, dir: number) {
@@ -293,7 +339,14 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
     { id: "space-sky", gradientUnits: "userSpaceOnUse", x1: 0, y1: -200, x2: 0, y2: 800 },
     defs
   );
-  const skyStops = [0, 0.45, 0.85, 1].map((offset) => el("stop", { offset }, skyGradient));
+  /* sky stops 0.85 and 1 share one colour, and a gradient pads past its last stop, so one stop covers both */
+  const skyStops = [0, 0.45, 0.85].map((offset) => el("stop", { offset }, skyGradient));
+  const paint = {
+    far: solid(defs, "space-fill-far"),
+    mid: solid(defs, "space-fill-mid"),
+    near: solid(defs, "space-fill-near"),
+    charminar: solid(defs, "space-fill-charminar"),
+  };
   const sunGradient = el("radialGradient", { id: "space-sun-glow" }, defs);
   el("stop", { offset: 0, "stop-color": "#fff1c9", "stop-opacity": 0.8 }, sunGradient);
   el("stop", { offset: 0.35, "stop-color": "#ffc27a", "stop-opacity": 0.32 }, sunGradient);
@@ -323,17 +376,126 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
   const moon = el("circle", { cx: 0, cy: 0, r: 25, fill: "#f4efdf", mask: "url(#space-moon-mask)" }, back);
   const glow = el("circle", { cx: L.sun, cy: 650, r: 430, fill: "url(#space-sun-glow)" }, back);
   const sun = el("circle", { cx: L.sun, cy: 650, r: 42, fill: "#ffe9c4" }, back);
+  /* ---------- evening clouds: long banks lit from below, thinner once it is dark ---------- */
+  const sky = createRandom(29);
+  const flat = el("clipPath", { id: "space-cloud-flat" }, defs);
+  el("rect", { x: -900, y: -500, width: 1800, height: 500 }, flat);
+  const cloudLayer = el("g", {}, back);
+  const clouds: Cloud[] = [];
+  const CLOUD_SPECS: readonly (readonly [number, number, number, number, number])[] = [
+    // share of the visible width, share of the visible height, width, height, depth
+    [0.3, 0.6, 380, 26, 0.9],
+    [0.74, 0.605, 430, 24, 1],
+    [0.88, 0.37, 300, 22, 0.6],
+    [0.8, 0.2, 250, 16, 0.4],
+    [0.56, 0.095, 320, 14, 0.35],
+  ];
+  for (const [fx, fy, w, h, depth] of CLOUD_SPECS) {
+    const low = clamp((fy - 0.1) / 0.5);
+    const bodyId = `space-fill-cloud-${clouds.length}`;
+    const bodyColor = solid(defs, bodyId);
+    const e = el("g", {}, cloudLayer);
+    const sway = el(
+      "g",
+      {
+        class: "space-cloud",
+        style: `--dur:${sky.range(55, 95).toFixed(0)}s;animation-delay:-${sky.range(0, 40).toFixed(0)}s`,
+      },
+      e
+    );
+    const shape = el("g", { "clip-path": "url(#space-cloud-flat)" }, sway);
+    const body = el("g", { fill: `url(#${bodyId})` }, shape);
+    const puffs = Math.max(4, Math.round(w / 64));
+    for (let i = 0; i < puffs; i++) {
+      const u = i / (puffs - 1);
+      const taper = 1 - Math.pow(Math.abs(u - 0.5) * 2, 1.7);
+      const r = h * (0.4 + 0.6 * taper) * sky.range(0.82, 1.1);
+      el("circle", { cx: ((u - 0.5) * w * 0.88).toFixed(1), cy: (-r * 0.5).toFixed(1), r: r.toFixed(1) }, body);
+    }
+    const glowBase = el(
+      "ellipse",
+      {
+        cx: 0,
+        cy: (-h * 0.1).toFixed(1),
+        rx: (w * 0.45).toFixed(1),
+        ry: (h * 0.3).toFixed(1),
+        fill: rgb(mix3([255, 176, 150], [255, 205, 140], low)),
+      },
+      shape
+    );
+    clouds.push({
+      e,
+      bodyColor,
+      glow: glowBase,
+      x: L.left + fx * L.visibleWidth,
+      y: L.top + fy * L.visibleHeight,
+      depth,
+      low,
+    });
+  }
+
+  /* ---------- sky lanterns: they glow brighter as it gets dark ---------- */
+  const lanternGlow = el("radialGradient", { id: "space-lantern-glow" }, defs);
+  el("stop", { offset: 0, "stop-color": "#ffc46b", "stop-opacity": 0.6 }, lanternGlow);
+  el("stop", { offset: 1, "stop-color": "#ff8a3d", "stop-opacity": 0 }, lanternGlow);
+  const lanternLayer = el("g", {}, back);
+  const lanterns: Lantern[] = [];
+  const LANTERN_SPECS: readonly (readonly [number, number, number])[] = [
+    // share of the visible width, share of the visible height, size
+    [0.36, 0.5, 1],
+    [0.26, 0.56, 0.8],
+    [0.46, 0.6, 0.9],
+    [0.52, 0.5, 0.7],
+    [0.8, 0.3, 1.1],
+    [0.9, 0.46, 0.85],
+    [0.84, 0.58, 0.75],
+    [0.94, 0.22, 0.9],
+  ];
+  for (const [fx, fy, size] of LANTERN_SPECS) {
+    const e = el("g", {}, lanternLayer);
+    const rise = el(
+      "g",
+      {
+        class: "space-lantern",
+        style: `--dur:${sky.range(60, 100).toFixed(0)}s;animation-delay:-${sky.range(0, 60).toFixed(0)}s`,
+      },
+      e
+    );
+    const lantern = el("g", { transform: `scale(${size})` }, rise);
+    const halo = el("circle", { r: 26, fill: "url(#space-lantern-glow)" }, lantern);
+    el("path", { d: "M-5.5,-7 Q0,-9.5 5.5,-7 L6.6,5 Q0,8.4 -6.6,5 Z", fill: "#ffa94a" }, lantern);
+    el("ellipse", { cx: 0, cy: -0.8, rx: 3.6, ry: 5, fill: "#fff0c4", opacity: 0.9 }, lantern);
+    el("rect", { x: -3, y: -10.4, width: 6, height: 2.2, rx: 0.8, fill: "#8a3f1c" }, lantern);
+    lanterns.push({ e, glow: halo, x: L.left + fx * L.visibleWidth, y: L.top + fy * L.visibleHeight, depth: size });
+  }
+
+  /* ---------- birds: already in the sky when the page opens ---------- */
   const birdsGroup = el("g", {}, back);
   const birds: SceneRefs["birds"] = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 11; i++) {
+    const far = i >= 7;
+    /* the first seven keep drawing from the shared random stream so the skyline below stays as approved */
+    const dx = i < 7 ? rr(-170, 40) : sky.range(-170, 40);
+    const level = ((i < 7 ? rr(300, 470) : sky.range(300, 470)) - 300) / 170;
+    const e = el("g", {}, birdsGroup);
+    el(
+      "path",
+      {
+        d: "M0,0 q9,-8 18,0 q9,-8 18,0",
+        fill: "none",
+        stroke: "#2a1a22",
+        "stroke-width": far ? 1.2 : 1.7,
+        "stroke-linecap": "round",
+        class: "space-bird",
+        style: `animation-duration:${sky.range(0.7, 1.1).toFixed(2)}s;animation-delay:-${sky.range(0, 1).toFixed(2)}s`,
+      },
+      e
+    );
     birds.push({
-      e: el(
-        "path",
-        { fill: "none", stroke: "#2a1a22", "stroke-width": 1.7, "stroke-linecap": "round" },
-        birdsGroup
-      ),
-      dx: rr(-170, 40),
-      y: rr(300, 470),
+      e,
+      dx: (dx + 170) * 0.95 - 15,
+      y: L.top + L.visibleHeight * (far ? 0.44 + level * 0.06 : 0.5 + level * 0.14),
+      scale: far ? 0.6 : sky.range(0.9, 1.25),
     });
   }
   const kite = el("g", {}, back);
@@ -370,7 +532,7 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
 
   /* ---------- far skyline, slowest layer ---------- */
   const farGroup = el("g", {}, back);
-  const far = el("g", {}, farGroup);
+  const far = el("g", { fill: "url(#space-fill-far)" }, farGroup);
   skyline(far, null, {
     base: 790,
     x0: L.left - 60,
@@ -383,10 +545,10 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
 
   /* ---------- mid layer: buildings, the Charminar, the two rooftop scenes ---------- */
   const midGroup = el("g", {}, back);
-  const charminarFill = el("g", {}, midGroup);
-  const mid = el("g", {}, midGroup);
+  const charminarFill = el("g", { fill: "url(#space-fill-charminar)" }, midGroup);
+  const mid = el("g", { fill: "url(#space-fill-mid)" }, midGroup);
   const midWindows = el("g", { fill: "#ffd27a", opacity: 0.8 }, midGroup);
-  const silhouettes = el("g", {}, midGroup);
+  const silhouettes = el("g", { fill: "url(#space-fill-near)" }, midGroup);
   const lights = el("g", { fill: "#ffd27a" }, midGroup);
   skyline(mid, midWindows, {
     base: 850,
@@ -598,7 +760,7 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
   }
 
   /* ---------- near layer: flat terrace (no parallax), windows, a cat ---------- */
-  const near = el("g", {}, back);
+  const near = el("g", { fill: "url(#space-fill-near)" }, back);
   const nearWindows = el("g", { fill: "#ffd27a" }, back);
   el("rect", { x: L.left - 80, y: GROUND, width: L.visibleWidth + 160, height: 160 }, near);
   for (let x = L.left - 60; x < L.right + 60; x += rr(70, 130)) {
@@ -613,7 +775,7 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
   }
   const catX = Math.min(L.right - 26, L.rightMid + 96);
   const cat = el("g", {}, back);
-  const catBody = el("g", {}, cat);
+  const catBody = el("g", { fill: "url(#space-fill-near)" }, cat);
   el("ellipse", { cx: 0, cy: -6, rx: 7, ry: 6.5 }, catBody);
   el("circle", { cx: 6.5, cy: -12, r: 4.6 }, catBody);
   el("path", { d: "M3.4,-15 L4,-20.5 L7.4,-16.4 Z M7.6,-16.6 L10.6,-20.5 L10.4,-14.8 Z" }, catBody);
@@ -657,13 +819,8 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
 
   const refs: SceneRefs = {
     layout,
-    back,
     skyStops,
-    far,
-    mid,
-    near,
-    silhouettes,
-    charminar: charminarFill,
+    paint,
     farGroup,
     midGroup,
     strokers,
@@ -673,6 +830,9 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
     moon,
     stars,
     twinkle,
+    lit: litGroups,
+    clouds,
+    lanterns,
     birdsGroup,
     birds,
     kite,
@@ -682,7 +842,6 @@ function buildScene(ctx: BuildContext, layout: SceneLayout): SceneRefs {
     chess,
     brush,
     cat,
-    catBody,
     catTail,
     catEyes,
     catX,
@@ -763,77 +922,104 @@ function applyFrame(s: SceneRefs, f: SceneFrame, reduced: boolean) {
   /* the phase that drives every wiggle; frozen when motion is reduced */
   const phase = reduced ? 0 : f.scrollY;
 
-  s.skyStops[0].setAttribute("stop-color", rgb(p.top));
-  s.skyStops[1].setAttribute("stop-color", rgb(p.mid));
-  s.skyStops[2].setAttribute("stop-color", rgb(p.hor));
-  s.skyStops[3].setAttribute("stop-color", rgb(p.hor));
-  s.far.setAttribute("fill", rgb(p.far));
-  s.mid.setAttribute("fill", rgb(p.midL));
-  s.near.setAttribute("fill", rgb(p.near));
-  s.silhouettes.setAttribute("fill", rgb(p.near));
-  s.charminar.setAttribute("fill", rgb(mix3(mix3(p.far, p.midL, 0.55), [201, 150, 92], p.win * 0.5)));
-  s.catBody.setAttribute("fill", rgb(p.near));
-  for (const stroker of s.strokers) stroker.setAttribute("stroke", rgb(p.near));
-  s.canvas.top.setAttribute("fill", rgb(p.top));
-  s.canvas.mid.setAttribute("fill", rgb(p.mid));
-  s.canvas.hor.setAttribute("fill", rgb(p.hor));
-  s.canvas.sky.setAttribute("fill", rgb(p.near));
-  s.back.style.setProperty("--space-t", t.toFixed(4));
+  put(s.skyStops[0], "stop-color", rgb(p.top));
+  put(s.skyStops[1], "stop-color", rgb(p.mid));
+  put(s.skyStops[2], "stop-color", rgb(p.hor));
+  put(s.paint.far, "stop-color", rgb(p.far));
+  put(s.paint.mid, "stop-color", rgb(p.midL));
+  const near = rgb(p.near);
+  put(s.paint.near, "stop-color", near);
+  put(s.paint.charminar, "stop-color", rgb(mix3(mix3(p.far, p.midL, 0.55), [201, 150, 92], p.win * 0.5)));
+  for (const stroker of s.strokers) put(stroker, "stroke", near);
+  put(s.canvas.top, "fill", rgb(p.top));
+  put(s.canvas.mid, "fill", rgb(p.mid));
+  put(s.canvas.hor, "fill", rgb(p.hor));
+  put(s.canvas.sky, "fill", near);
+  /* windows light up one by one as it gets dark */
+  for (const group of s.lit) {
+    const value = clamp((t - group.th) * 22).toFixed(2);
+    if (value === group.last) continue;
+    group.last = value;
+    group.e.setAttribute("opacity", value);
+  }
 
   /* depth: the farther the layer, the less it drifts as you scroll */
   const drift = reduced ? 0 : 1;
-  s.farGroup.setAttribute("transform", `translate(0,${(t * 12 * drift).toFixed(1)})`);
+  put(s.farGroup, "transform", `translate(0,${(t * 12 * drift).toFixed(1)})`);
   const sink = t * 24 * drift;
-  s.midGroup.setAttribute("transform", `translate(0,${sink.toFixed(1)})`);
+  put(s.midGroup, "transform", `translate(0,${sink.toFixed(1)})`);
 
-  s.sun.setAttribute("cy", String(p.sunY));
-  s.glow.setAttribute("cy", String(p.sunY));
-  s.sun.setAttribute("opacity", String(p.sun));
-  s.glow.setAttribute("opacity", String(Math.min(1, p.sun * 1.1)));
-  s.moon.setAttribute(
-    "transform",
-    `translate(${(L.rightMid + 8).toFixed(1)},${lerp(340, 150, smooth(clamp((t - 0.4) / 0.6))).toFixed(1)})`
-  );
-  s.moon.setAttribute("opacity", String(p.moon));
-  s.stars.setAttribute("opacity", String(p.stars));
-  if (!reduced) {
+  /* what is out of sight is left alone: the sun after dusk, the moon and the stars by day */
+  if (p.sun > 0.002) {
+    put(s.sun, "cy", String(p.sunY));
+    put(s.glow, "cy", String(p.sunY));
+  }
+  put(s.sun, "opacity", String(p.sun));
+  put(s.glow, "opacity", String(Math.min(1, p.sun * 1.1)));
+  if (p.moon > 0.002) {
+    put(
+      s.moon,
+      "transform",
+      `translate(${(L.rightMid + 8).toFixed(1)},${lerp(340, 150, smooth(clamp((t - 0.4) / 0.6))).toFixed(1)})`
+    );
+  }
+  put(s.moon, "opacity", String(p.moon));
+  put(s.stars, "opacity", String(p.stars));
+  if (!reduced && p.stars > 0.002) {
     s.twinkle.forEach(([star, base], i) => {
-      star.setAttribute("opacity", (base * (0.55 + 0.45 * Math.sin(phase / 46 + i * 2.1))).toFixed(2));
+      put(star, "opacity", (base * (0.55 + 0.45 * Math.sin(phase / 46 + i * 2.1))).toFixed(2));
     });
   }
 
-  /* birds cross the sky by day, flapping while you scroll */
-  s.birdsGroup.setAttribute("opacity", String(p.birds));
-  const flockX = lerp(L.left - 90, L.right + 90, clamp(t / 0.5));
-  s.birds.forEach((bird, i) => {
-    const flap = reduced ? 0.6 : 0.2 + 0.8 * Math.abs(Math.sin(phase / 13 + i * 1.3));
-    const x = flockX + bird.dx;
-    const y = bird.y + Math.sin(phase / 90 + i) * 4 * drift;
-    bird.e.setAttribute(
-      "d",
-      `M${x.toFixed(1)},${y.toFixed(1)} q9,${(-8 * flap).toFixed(1)} 18,0 q9,${(-8 * flap).toFixed(1)} 18,0`
-    );
+  /* clouds: warm along the underside while the sun is up, then they cool and thin out */
+  const light = clamp(p.sun / 0.9);
+  s.clouds.forEach((cloud) => {
+    const x = cloud.x - t * 130 * cloud.depth * drift;
+    put(cloud.e, "transform", `translate(${x.toFixed(1)},${cloud.y.toFixed(1)})`);
+    const base = mix3(p.mid, p.hor, 0.2 + 0.4 * cloud.low);
+    put(cloud.bodyColor, "stop-color", rgb(mix3(base, [255, 226, 205], 0.1 + 0.18 * light)));
+    put(cloud.glow, "opacity", (0.85 * light).toFixed(2));
+    put(cloud.e, "opacity", lerp(0.4, 0.92, light).toFixed(2));
   });
+
+  /* lanterns drift up with the scroll and glow brighter as it gets dark */
+  s.lanterns.forEach((lantern) => {
+    const y = lantern.y - t * 150 * lantern.depth * drift;
+    put(lantern.e, "transform", `translate(${lantern.x.toFixed(1)},${y.toFixed(1)})`);
+    put(lantern.glow, "opacity", lerp(0.45, 1, 1 - light).toFixed(2));
+  });
+
+  /* birds cross the sky by day: from the left as the page opens, off to the right as you scroll */
+  put(s.birdsGroup, "opacity", String(p.birds));
+  if (p.birds > 0.004) {
+    const flockX = lerp(L.left + L.visibleWidth * 0.16, L.right + 120, clamp(t / 0.55));
+    s.birds.forEach((bird, i) => {
+      const x = flockX + bird.dx;
+      const y = bird.y + Math.sin(phase / 90 + i) * 4 * drift;
+      put(bird.e, "transform", `translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${bird.scale.toFixed(2)})`);
+    });
+  }
 
   /* kite: climbs as the evening goes, bobs with the scroll, leans with a fast one */
   const tilt = reduced ? 0 : clamp(velocity * 0.5, -12, 12);
   const kx = L.leftMid + 20 + Math.sin(phase / 190) * 14;
   const ky = lerp(560, 430, smooth(t)) + Math.sin(phase / 140) * 9;
-  s.kiteBody.setAttribute("transform", `translate(${kx.toFixed(1)},${ky.toFixed(1)}) rotate(${tilt.toFixed(1)})`);
+  put(s.kiteBody, "transform", `translate(${kx.toFixed(1)},${ky.toFixed(1)}) rotate(${tilt.toFixed(1)})`);
   const ax = L.leftMid + 46;
   const ay = 744 + sink;
-  s.kiteString.setAttribute(
+  put(
+    s.kiteString,
     "d",
     `M${ax.toFixed(1)},${ay.toFixed(1)} Q${((ax + kx) / 2 - 14 - tilt).toFixed(1)},${((ay + ky) / 2 + 22).toFixed(1)} ${kx.toFixed(1)},${(ky + 27).toFixed(1)}`
   );
-  s.kite.setAttribute("opacity", (1 - clamp((t - 0.3) * 1.3) * 0.55).toFixed(2));
+  put(s.kite, "opacity", (1 - clamp((t - 0.3) * 1.3) * 0.55).toFixed(2));
 
   /* string lights and cat eyes come on as it gets dark */
   s.bulbs.forEach(([bulb, threshold], i) => {
     const flicker = reduced ? 1 : 0.72 + 0.28 * Math.sin(phase / 38 + i * 1.6);
-    bulb.setAttribute("opacity", (clamp((t - threshold) * 22) * flicker).toFixed(2));
+    put(bulb, "opacity", (clamp((t - threshold) * 22) * flicker).toFixed(2));
   });
-  s.catEyes.setAttribute("opacity", clamp((t - 0.32) * 6).toFixed(2));
+  put(s.catEyes, "opacity", clamp((t - 0.32) * 6).toFixed(2));
 
   /* chess: pieces travel with the scroll, the player whose move it is leans in */
   const chess = s.chess;
@@ -847,24 +1033,25 @@ function applyFrame(s: SceneRefs, f: SceneFrame, reduced: boolean) {
   for (const piece of chess.pieces) {
     const [x, y] = piecePosition(piece, t);
     const angle = piece === chess.king ? chess.tip * 84 : 0;
-    piece.e.setAttribute("transform", `translate(${x.toFixed(2)},${y.toFixed(2)}) rotate(${angle.toFixed(1)})`);
+    put(piece.e, "transform", `translate(${x.toFixed(2)},${y.toFixed(2)}) rotate(${angle.toFixed(1)})`);
   }
   chess.arms.forEach((a, i) => {
     const b = reach[i];
-    a.upper.setAttribute("transform", `rotate(${(15 * b).toFixed(1)},0,${a.hipY})`);
-    a.arm.setAttribute(
+    put(a.upper, "transform", `rotate(${(15 * b).toFixed(1)},0,${a.hipY})`);
+    put(
+      a.arm,
       "d",
       `M1.6,${a.hipY - 17} L${(11 + 6 * b).toFixed(1)},${(a.hipY - 16.2 + 0.8 * b).toFixed(1)}`
     );
   });
 
   /* painter: the brush strokes as long as you scroll */
-  s.brush.setAttribute("transform", `rotate(${(Math.sin(phase / 15) * (2 + 14 * energy)).toFixed(1)},9,-30)`);
+  put(s.brush, "transform", `rotate(${(Math.sin(phase / 15) * (2 + 14 * energy)).toFixed(1)},9,-30)`);
 
   /* cat: watches the car go by, tail swishes with the scroll */
   const facing = carX(s, t) < s.catX - 8 ? -1 : 1;
-  s.cat.setAttribute("transform", `translate(${s.catX.toFixed(1)},${GROUND - 1}) scale(${(facing * 1.3).toFixed(2)},1.3)`);
-  s.catTail.setAttribute("transform", `rotate(${(Math.sin(phase / 34) * (5 + 16 * energy)).toFixed(1)},-6,-3)`);
+  put(s.cat, "transform", `translate(${s.catX.toFixed(1)},${GROUND - 1}) scale(${(facing * 1.3).toFixed(2)},1.3)`);
+  put(s.catTail, "transform", `rotate(${(Math.sin(phase / 34) * (5 + 16 * energy)).toFixed(1)},-6,-3)`);
 
   placeCar(s, t);
 }

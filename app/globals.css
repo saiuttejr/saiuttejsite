@@ -711,10 +711,6 @@
     pointer-events: all;
   }
 
-  .space-lit {
-    opacity: clamp(0, calc((var(--space-t, 0) - var(--th, 0)) * 22), 1);
-  }
-
   .space-kite {
     transform-box: fill-box;
     transform-origin: 50% 100%;
@@ -727,6 +723,58 @@
     }
     to {
       transform: rotate(5deg);
+    }
+  }
+
+  .space-bird {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: space-flap 0.9s ease-in-out infinite alternate;
+  }
+
+  @keyframes space-flap {
+    from {
+      transform: scaleY(1);
+    }
+    to {
+      transform: scaleY(0.28);
+    }
+  }
+
+  .space-cloud {
+    animation: space-cloud-drift var(--dur, 70s) ease-in-out infinite alternate;
+  }
+
+  @keyframes space-cloud-drift {
+    from {
+      transform: translateX(-12px);
+    }
+    to {
+      transform: translateX(12px);
+    }
+  }
+
+  .space-lantern {
+    animation: space-lantern-rise var(--dur, 80s) linear infinite;
+  }
+
+  @keyframes space-lantern-rise {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0);
+    }
+    10% {
+      opacity: 1;
+    }
+    50% {
+      transform: translate(10px, -110px);
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-6px, -220px);
     }
   }
 
@@ -753,14 +801,72 @@
   }
 
   .space-hero {
+    --h: clamp(150px, min(15.5vw, 26.5svh), 270px);
     position: relative;
     height: 84svh;
     min-height: 560px;
   }
 
+  /* The name and the word, in the sky left of the photos. */
+  .space-title {
+    position: absolute;
+    top: max(104px, 15svh);
+    left: var(--pad);
+    z-index: 1;
+    margin: 0;
+    font-family: var(--font-display);
+    color: #fff0dc;
+    opacity: clamp(0, calc(1 - var(--hs, 0) / 380), 1);
+    transform: translate3d(0, calc(var(--hs, 0) * 0.22px), 0);
+    animation: space-card-in 900ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  }
+
+  .space-title-name {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-size: clamp(1rem, 1.2vw, 1.2rem);
+    font-weight: 640;
+    line-height: 1.1;
+    color: rgb(255 240 222 / 94%);
+    text-shadow: 0 1px 14px rgb(70 24 32 / 40%);
+  }
+
+  .space-title-word {
+    display: block;
+    padding-block: 0.08em 0.22em;
+    margin-block: -0.08em -0.22em;
+    font-size: clamp(5.25rem, min(10.8vw, 23svh), 12rem);
+    font-weight: 760;
+    line-height: 0.86;
+    letter-spacing: calc(-0.045em + var(--hs, 0) * 0.0007em);
+    color: #fff3e0;
+    background: linear-gradient(180deg, #fffaf0 12%, #ffe2c0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 26px rgb(84 26 34 / 32%));
+  }
+
+  .space-title-word::after {
+    content: "";
+    display: inline-block;
+    width: 0.15em;
+    height: 0.15em;
+    margin-left: 0.07em;
+    border-radius: 50%;
+    background: #e03516;
+  }
+
+  @media (forced-colors: active) {
+    .space-title-word {
+      background: none;
+      -webkit-text-fill-color: currentColor;
+      filter: none;
+    }
+  }
+
   /* Four photos of me, whole frames, overlapping, in the empty sky of the hero. */
   .space-cards {
-    --h: clamp(150px, min(15.5vw, 26.5svh), 270px);
     position: absolute;
     top: max(84px, 13svh);
     left: 58.5%;
@@ -1141,11 +1247,19 @@
 
   @media (max-width: 900px) {
     .space-hero {
+      --h: clamp(120px, 32vw, 200px);
       height: 66svh;
     }
 
+    .space-title {
+      top: calc(13svh + var(--h) * 1.14 + 1.25rem);
+    }
+
+    .space-title-word {
+      font-size: clamp(4.5rem, 21vw, 7.5rem);
+    }
+
     .space-cards {
-      --h: clamp(120px, 32vw, 200px);
       top: 13svh;
       left: 50%;
     }

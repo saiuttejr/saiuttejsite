@@ -10,7 +10,7 @@ Editorial personal website for **Sai Uttej Rajoju**, built around two distinct m
 - **Space (`/space`) — One rooftop, golden hour to night**:
   - **Scroll-driven scene**: A fixed SVG skyline and rooftop terrace sits behind the page. Scrolling moves the evening from golden hour to night: the sky, the light, the lit windows, a small clock and the masthead pills all follow.
   - **Photos**: Four photos of Sai overlap as small cards in the hero, then a wall of rounded tiles (photos, a Watching tile and a Reading tile with cover art, and a Lichess tile). The wall dims at night except around a lamp that follows the pointer.
-  - **Quiet details**: A chess table, a painter and a car react to clicks and scrolling. The cursor is a small F1 car that turns toward where it is going, leaves tyre marks, and switches its headlights on as it gets dark (mouse users only). There is no hero copy.
+  - **Quiet details**: A chess table, a painter and a car react to clicks and scrolling. The cursor is a small F1 car that turns toward where it is going, leaves tyre marks, and switches its headlights on as it gets dark (mouse users only). The only copy is the name and a large "Space" in the sky, shared with evening clouds, birds and sky lanterns. Wheel scrolling is smoothed in JavaScript so the evening glides instead of jumping.
   - **Links**: `Letterboxd`, `Lichess`, `MyAnimeList`, `Goodreads` and email are lit windows in a building on the terrace, with `← Back to Work` above the roof.
 
 ## Stack
@@ -44,8 +44,9 @@ npm run start
 - `components/SpaceCursor.tsx` — The F1 car cursor and its tyre marks
 - `lib/space-data.ts` — Hero photos, wall tiles, and window links
 - `lib/space-palette.ts` — Golden-hour-to-night palette, clock, and lamp curves
-- `lib/space-scene.ts` — The SVG scene: sky, skyline, terrace, vignettes, and easter eggs
-- `components/MotionRuntime.tsx` — Scroll reveal observer, room attribute & theme-color sync
+- `lib/space-scene.ts` — The SVG scene: sky, clouds, birds, lanterns, skyline, terrace, vignettes, and easter eggs
+- `lib/smooth-scroll.ts` — Eased wheel scrolling (also under reduced motion, where the browser jumps)
+- `components/MotionRuntime.tsx` — Scroll reveal observer, room attribute & theme-color sync, smooth scrolling
 - `lib/site-data.ts` — Profile links, 4-project index, and verified credentials
 - `public/Sai_Uttej_Rajoju_Resume.pdf` — Canonical resume PDF
 - `doc/site_technical_documentation.md` — Full technical documentation
