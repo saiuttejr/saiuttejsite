@@ -11,7 +11,7 @@ export default function NotFound() {
             <span>← Back to Work</span>
           </Link>
           <Link href="/space" className="ed-link">
-            <span>After Hours →</span>
+            <span>Space →</span>
           </Link>
         </div>
       </main>

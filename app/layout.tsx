@@ -39,6 +39,7 @@ const personJsonLd = {
     SITE_PROFILE.links.github,
     SITE_PROFILE.links.linkedin,
     SITE_PROFILE.links.letterboxd,
+    SITE_PROFILE.links.lichess,
     SITE_PROFILE.links.goodreads,
     SITE_PROFILE.links.myanimelist,
   ],
