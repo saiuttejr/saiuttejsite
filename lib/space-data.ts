@@ -110,12 +110,17 @@ export const SPACE_TILES: readonly SpaceTile[] = [
   },
   {
     kind: "photo",
-    id: "dusk-city",
+    id: "sunset-city",
     col: "4 / 10",
     row: "3 / 5",
     shape: "wide",
-    position: "50% 45%",
-    photo: photo("dusk-city", 1400, 788, "A city at dusk seen from a footbridge, railway lines below"),
+    position: "50% 28%",
+    photo: photo(
+      "sunset-city",
+      1400,
+      812,
+      "An orange and pink sunset over a city, seen from a footbridge with a curved metal roof and railway lines below"
+    ),
   },
   {
     kind: "photo",
@@ -152,12 +157,30 @@ export const SPACE_TILES: readonly SpaceTile[] = [
   },
   {
     kind: "photo",
-    id: "pink-wires",
-    col: "4 / 10",
+    id: "palm-road",
+    col: "4 / 6",
     row: "5 / 7",
-    shape: "wide",
-    position: "50% 92%",
-    photo: photo("pink-wires", 1400, 1145, "Power lines against a pale pink dusk sky"),
+    shape: "portrait",
+    position: "50% 50%",
+    photo: photo("palm-road", 800, 1000, "A road curving through palm trees under a blue sky with clouds"),
+  },
+  {
+    kind: "photo",
+    id: "backpack-road",
+    col: "6 / 8",
+    row: "5 / 7",
+    shape: "portrait",
+    position: "50% 50%",
+    photo: photo("backpack-road", 800, 1000, "A traveller with a black backpack on a quiet road, a stone arch behind him"),
+  },
+  {
+    kind: "photo",
+    id: "cloud-street",
+    col: "8 / 10",
+    row: "5 / 7",
+    shape: "portrait",
+    position: "50% 50%",
+    photo: photo("cloud-street", 800, 1000, "A wide street under a big sky of thin white clouds, a scooter far ahead"),
   },
   {
     kind: "photo",
@@ -202,12 +225,17 @@ export const SPACE_TILES: readonly SpaceTile[] = [
   },
   {
     kind: "photo",
-    id: "golden-hills",
+    id: "gateway",
     col: "10 / 13",
     row: "9 / 11",
     shape: "standard",
-    position: "50% 30%",
-    photo: photo("golden-hills", 1400, 788, "Low sun over terraced tea hills"),
+    position: "50% 20%",
+    photo: photo(
+      "gateway",
+      1200,
+      1021,
+      "The Gateway of India under a clear blue sky, visitors gathered in front of it"
+    ),
   },
   {
     kind: "chess",
