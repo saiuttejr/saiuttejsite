@@ -9,6 +9,10 @@ interface Mark {
   rx: number;
   ry: number;
   born: number;
+  /** 0..1: how hard the tyres bite, from speed and turning. */
+  power: number;
+  /** First mark of a stroke: nothing is drawn back to the mark before it. */
+  start: boolean;
 }
 
 const INTERACTIVE = "a, button, [role='button'], .space-hit";
@@ -18,14 +22,16 @@ const FOLLOW_CALM = 0.55; // reduced motion: a short ease instead of none
 const TURN = 0.14; // same, for the heading
 const TURN_CALM = 0.3; // reduced motion: the car turns quickly
 const TURN_MIN = 110; // px/s: slower than this the car keeps its heading
-const MARK_MIN = 260; // px/s: faster than this the rear tyres leave marks
+const MARK_MIN = 120; // px/s: faster than this the rear tyres leave marks
+const MARK_FULL = 1000; // px/s: marks are at their strongest
 const MARK_GAP = 5; // px of travel between two marks
 const MARK_LIFE = 1100; // ms
-const MAX_MARKS = 180;
+const MARK_LIFE_CALM = 800; // reduced motion: shorter and fainter, but still there
+const MAX_MARKS = 260;
 const REAR = 15; // px from the car's centre to its rear axle
 const HALF_TRACK = 8.2;
 const SNAP = 0.35;
-const BUCKETS = 8;
+const BUCKETS = 10;
 
 export function SpaceCursor() {
   const carRef = useRef<HTMLDivElement>(null);
@@ -46,18 +52,20 @@ export function SpaceCursor() {
     const forced = window.matchMedia("(forced-colors: active)");
 
     const marks: Mark[] = [];
+    const groups: number[][] = Array.from({ length: BUCKETS }, () => []);
     const target = { x: 0, y: 0 };
     const pos = { x: 0, y: 0 };
     let vx = 0;
     let vy = 0;
     let heading = -90;
     let travelled = 0;
+    let drawing = false;
     let night = 0;
     let lights = "";
     let shown = false;
     let hover = false;
     let running = false;
-    let calmMode = calm.matches; // reduced motion: no easing, no tyre marks
+    let calmMode = calm.matches; // reduced motion: a short ease, shorter and fainter tyre marks
     let painted = false;
     let raf = 0;
     let last = 0;
@@ -84,7 +92,8 @@ export function SpaceCursor() {
     }
 
     function paint(now: number) {
-      while (marks.length > 0 && now - marks[0].born > MARK_LIFE) marks.shift();
+      const life = calmMode ? MARK_LIFE_CALM : MARK_LIFE;
+      while (marks.length > 0 && now - marks[0].born > life) marks.shift();
       if (marks.length < 2) {
         if (painted) {
           ctx.clearRect(0, 0, width, height);
@@ -98,31 +107,63 @@ export function SpaceCursor() {
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
 
+      /* a segment's strength is how hard the tyres bit and how much of its life is left */
+      for (const group of groups) group.length = 0;
+      for (let i = 1; i < marks.length; i++) {
+        const m = marks[i];
+        if (m.start) continue;
+        const level = (1 - (now - m.born) / life) * m.power;
+        groups[clamp(Math.floor(level * BUCKETS), 0, BUCKETS - 1)].push(i);
+      }
+
       const layers = [
-        { color: "255,240,225", alpha: lerp(0.1, 0.22, night), light: true },
-        { color: "18,8,14", alpha: lerp(0.36, 0.2, night), light: false },
+        { color: "255,240,225", alpha: lerp(0.12, 0.24, night), light: true },
+        { color: "18,8,14", alpha: lerp(0.5, 0.28, night), light: false },
       ];
       for (const layer of layers) {
-        for (let b = 0; b < BUCKETS; b++) {
-          const fresh = (b + 0.5) / BUCKETS;
-          const w = 2.2 + fresh * 1.6;
-          ctx.strokeStyle = `rgba(${layer.color},${(fresh * fresh * layer.alpha).toFixed(3)})`;
-          ctx.lineWidth = layer.light ? w + 1.5 : w * 0.56;
+        groups.forEach((group, b) => {
+          if (group.length === 0) return;
+          const level = (b + 0.5) / BUCKETS;
+          const w = 1.6 + level * 1.8;
+          ctx.strokeStyle = `rgba(${layer.color},${(Math.pow(level, 1.4) * layer.alpha).toFixed(3)})`;
+          ctx.lineWidth = layer.light ? w + 1.4 : w * 0.62;
           ctx.beginPath();
-          for (let i = 1; i < marks.length; i++) {
+          for (const i of group) {
             const a = marks[i - 1];
             const m = marks[i];
-            if (m.born - a.born > 120) continue;
-            const age = 1 - (now - m.born) / MARK_LIFE;
-            if (Math.min(BUCKETS - 1, Math.floor(age * BUCKETS)) !== b) continue;
             ctx.moveTo(a.lx, a.ly);
             ctx.lineTo(m.lx, m.ly);
             ctx.moveTo(a.rx, a.ry);
             ctx.lineTo(m.rx, m.ry);
           }
           ctx.stroke();
-        }
+        });
       }
+    }
+
+    /* the rear tyres leave a mark every few px along this frame's path, so curves stay smooth at any speed */
+    function leaveMarks(now: number, dt: number, mx: number, my: number, fromHeading: number, speed: number) {
+      const run = Math.hypot(mx, my);
+      const swing = ((((heading - fromHeading + 180) % 360) + 360) % 360) - 180;
+      const bite = 0.4 + 0.5 * clamp((speed - MARK_MIN) / (MARK_FULL - MARK_MIN)) + 0.3 * clamp(Math.abs(swing) / dt / 240);
+      const power = Math.min(1, bite) * (calmMode ? 0.9 : 1);
+      const x0 = pos.x - mx;
+      const y0 = pos.y - my;
+      let at = MARK_GAP - travelled;
+      for (let n = 0; at <= run && n < 40; n++, at += MARK_GAP) {
+        const u = at / run;
+        const rad = ((fromHeading + swing * u) * Math.PI) / 180;
+        const fx = Math.cos(rad);
+        const fy = Math.sin(rad);
+        const bx = x0 + mx * u - fx * REAR;
+        const by = y0 + my * u - fy * REAR;
+        const sx = -fy * HALF_TRACK;
+        const sy = fx * HALF_TRACK;
+        marks.push({ lx: bx - sx, ly: by - sy, rx: bx + sx, ry: by + sy, born: now, power, start: !drawing });
+        drawing = true;
+      }
+      travelled = (travelled + run) % MARK_GAP;
+      while (marks.length > MAX_MARKS) marks.shift();
     }
 
     function tick(now: number) {
@@ -144,6 +185,7 @@ export function SpaceCursor() {
       vy += (my / dt - vy) * blend;
       const speed = Math.hypot(vx, vy);
 
+      const fromHeading = heading;
       if (speed > TURN_MIN) {
         let diff = (Math.atan2(vy, vx) * 180) / Math.PI - heading;
         diff = ((((diff + 180) % 360) + 360) % 360) - 180;
@@ -153,22 +195,11 @@ export function SpaceCursor() {
       }
       carEl.style.transform = `translate3d(${pos.x.toFixed(2)}px,${pos.y.toFixed(2)}px,0) rotate(${(heading + 90).toFixed(1)}deg)`;
 
-      if (!calmMode && speed > MARK_MIN) {
-        travelled += Math.hypot(mx, my);
-        if (travelled >= MARK_GAP) {
-          travelled %= MARK_GAP;
-          const rad = (heading * Math.PI) / 180;
-          const fx = Math.cos(rad);
-          const fy = Math.sin(rad);
-          const bx = pos.x - fx * REAR;
-          const by = pos.y - fy * REAR;
-          const sx = -fy * HALF_TRACK;
-          const sy = fx * HALF_TRACK;
-          marks.push({ lx: bx - sx, ly: by - sy, rx: bx + sx, ry: by + sy, born: now });
-          if (marks.length > MAX_MARKS) marks.shift();
-        }
+      if (speed > MARK_MIN) {
+        leaveMarks(now, dt, mx, my, fromHeading, speed);
       } else {
         travelled = 0;
+        drawing = false;
       }
 
       paint(now);
@@ -188,6 +219,7 @@ export function SpaceCursor() {
       vx = 0;
       vy = 0;
       travelled = 0;
+      drawing = false;
       carEl.style.transform = `translate3d(${x}px,${y}px,0) rotate(${heading + 90}deg)`;
       carEl.classList.add("is-on");
       html.classList.add("space-cursor-on");
@@ -200,6 +232,7 @@ export function SpaceCursor() {
       window.cancelAnimationFrame(raf);
       raf = 0;
       marks.length = 0;
+      drawing = false;
       paint(performance.now());
       carEl.classList.remove("is-on", "is-hover", "is-down");
       html.classList.remove("space-cursor-on");
@@ -270,10 +303,6 @@ export function SpaceCursor() {
 
     function sync() {
       calmMode = calm.matches;
-      if (calmMode) {
-        marks.length = 0;
-        paint(performance.now());
-      }
       const wanted = fine.matches && !forced.matches;
       if (wanted && !running) start();
       else if (!wanted && running) stop();
