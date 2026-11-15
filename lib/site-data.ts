@@ -12,6 +12,7 @@ export const SITE_PROFILE = {
     github: "https://github.com/saiuttejr",
     linkedin: "https://linkedin.com/in/sai-uttej-r",
     letterboxd: "https://letterboxd.com/contra156/",
+    lichess: "https://lichess.org/@/Haccnt",
     myanimelist: "https://myanimelist.net/profile/Contra156",
     goodreads: "https://www.goodreads.com/user/show/195818008",
   },

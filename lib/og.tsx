@@ -63,7 +63,7 @@ export async function renderOpenGraphCard(subtitle = SITE_PROFILE.role) {
             </span>
             <span
               style={{
-                backgroundColor: "#ff3b1f",
+                backgroundColor: "#e03516",
                 color: "#ffffff",
                 padding: "8px 18px",
                 borderRadius: 999,
